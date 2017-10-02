@@ -261,10 +261,12 @@ if __name__ == '__main__':
     with open('config.json') as file:
         _CONF = json.load(file)
        
-        # replace {key} and {secret}
-        file = open("key.txt", "r") 
-        for line in file: 
-            key = line.split(':')[0]
-            _CONF[key] = line.split(':')[1]
+
+         # replace {key} and {secret}
+        keys = json.load(open('key.json')) 
+        for key in keys: 
+            _CONF[key] = keys[key]
+
+        print(_CONF)
         validate(_CONF, CONF_SCHEMA)
         app(_CONF)
