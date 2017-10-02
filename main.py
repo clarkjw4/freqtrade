@@ -260,5 +260,11 @@ def app(config: dict) -> None:
 if __name__ == '__main__':
     with open('config.json') as file:
         _CONF = json.load(file)
+       
+        # replace {key} and {secret}
+        file = open("key.txt", "r") 
+        for line in file: 
+            key = line.split(':')[0]
+            _CONF[key] = line.split(':')[1]
         validate(_CONF, CONF_SCHEMA)
         app(_CONF)
