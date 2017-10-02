@@ -5,12 +5,18 @@ import arrow
 import requests
 from pandas import DataFrame
 import talib.abstract as ta
+import talib
+import pandas as pd
+import numpy as np
 
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+# Backtesting Counter
+class Counter:
+    counter = 0
 
 def get_ticker(pair: str, minimum_date: arrow.Arrow) -> dict:
     """
@@ -22,7 +28,7 @@ def get_ticker(pair: str, minimum_date: arrow.Arrow) -> dict:
     }
     params = {
         'marketName': pair.replace('_', '-'),
-        'tickInterval': 'fiveMin',
+        'tickInterval': 'oneMin',
         '_': minimum_date.timestamp * 1000
     }
     data = requests.get(url, params=params, headers=headers).json()
@@ -48,12 +54,112 @@ def populate_indicators(dataframe: DataFrame) -> DataFrame:
     """
     Adds several different TA indicators to the given DataFrame
     """
+    #Exponential Moving Average
     dataframe['ema'] = ta.EMA(dataframe, timeperiod=33)
+
+    #Parabolic SAR
     dataframe['sar'] = ta.SAR(dataframe, 0.02, 0.22)
+
+    #Average Directional Movement Index
     dataframe['adx'] = ta.ADX(dataframe)
 
+    #Relative Strength Index
+    dataframe['rsi'] = ta.RSI(dataframe, 14)
+    dataframe = RSI (dataframe)
+
+    #Absolute Price Oscillator
+    dataframe['apo'] = ta.APO(dataframe, fastperiod=12, slowperiod=26, matype=0)
+
+    #Momentum
+    dataframe['mom'] = ta.MOM(dataframe, 10)
+
+    #Bollinger Bands
+    dataframe = BBANDS(20, dataframe, 2)
+
+    # Stochcastic
+    dataframe['K'] = STOK(dataframe, 14)
+    dataframe['D'] = STOD(dataframe, 14)
+    dataframe = STOCH (dataframe)
+
+    # if Counter.counter < 30:
+    #     print(dataframe)
+    #     Counter.counter = Counter.counter + 1
+    #
+    # else:
+    #     exit()
+    #
     return dataframe
 
+# RSI
+def RSI (df):
+
+    df['PositionRSI'] = None
+
+    for row in range(len(df)):
+
+        if (df['rsi'].iloc[row] < 20.0):
+            df['PositionRSI'].iloc[row] = 1
+
+        else:
+            df['PositionRSI'].iloc[row] = -1
+
+    return df
+
+# Stochcastic
+def STOK(df, n):
+    STOK = ((df['close'] - pd.rolling_min(df['low'], n)) /
+    (pd.rolling_max(df['high'], n) - pd.rolling_min(df['low'], n))) * 100
+
+    return STOK
+
+def STOD(df, n):
+    STOK = ((df['close'] - pd.rolling_min(df['low'], n)) /
+    (pd.rolling_max(df['high'], n) - pd.rolling_min(df['low'], n))) * 100
+
+    STOD = pd.rolling_mean(STOK, 3)
+
+    return STOD
+
+def STOCH(df):
+
+    #Create an "empty" column as placeholder for our /position signal
+    df['PositionSTOCH'] = None
+
+    for row in range(len(df)):
+
+        if (df['K'].iloc[row] < 20.0) and (df['D'].iloc[row] < 20.0):
+            df['PositionSTOCH'].iloc[row] = 1
+
+        else:
+            df['PositionSTOCH'].iloc[row] = -1
+
+    return df
+
+
+# Working Bollinger Bands
+def BBANDS(k, df, n):
+    MA = pd.stats.moments.rolling_mean(df['close'],k)
+    MSD = pd.stats.moments.rolling_std(df['close'],k)
+    df['upper'] = MA + (MSD*n)
+    df['lower'] = MA - (MSD*n)
+
+    #Create an "empty" column as placeholder for our /position signals
+    df['PositionBBANDS'] = None
+
+    #Fill our newly created position column - set to sell (-1) when the price hits the upper band, and set to buy (1) when it hits the lower band
+    for row in range(len(df)):
+
+        if (df['close'].iloc[row] > df['upper'].iloc[row]) and (df['close'].iloc[row-1] < df['upper'].iloc[row-1]):
+            df['PositionBBANDS'].iloc[row] = -1
+
+        if (df['close'].iloc[row] < df['lower'].iloc[row]) and (df['close'].iloc[row-1] > df['lower'].iloc[row-1]):
+            df['PositionBBANDS'].iloc[row] = 1
+
+    #Forward fill our position column to replace the "None" values with the correct long/short positions to represent the "holding" of our position
+    #forward through time
+    df['PositionBBANDS'].fillna(method='ffill',inplace=True)
+
+    return df
 
 def populate_buy_trend(dataframe: DataFrame) -> DataFrame:
     """
@@ -78,11 +184,20 @@ def populate_buy_trend(dataframe: DataFrame) -> DataFrame:
     dataframe.loc[dataframe['ema'] <= dataframe['close'], 'upswing'] = 1
 
     dataframe.loc[
-        (dataframe['upswing'] == 1) &
-        (dataframe['swap'] == 1) &
-        (dataframe['adx'] > 25), # adx over 25 tells there's enough momentum
-        'buy'] = 1
-    dataframe.loc[dataframe['buy'] == 1, 'buy_price'] = dataframe['close']
+        # (dataframe['swap'] == 1) &
+        # (dataframe['upswing'] == 1) &
+        # (dataframe['adx'] > 25) & # adx over 25 tells there's enough momentum
+        (dataframe['PositionBBANDS'] == 1) &
+        (dataframe['PositionSTOCH'] == 1) &
+        (dataframe['PositionRSI'] == 1),
+        'buy'
+    ] = 1
+
+    dataframe.loc[
+        (dataframe['buy'] == 1),
+        'buy_price'
+    ] = dataframe['close']
+
 
     return dataframe
 

@@ -4,7 +4,7 @@ import logging
 import time
 import traceback
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Optional
 
 from jsonschema import validate
 
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 __author__ = "gcarq"
 __copyright__ = "gcarq 2017"
 __license__ = "GPLv3"
-__version__ = "0.10.0"
+__version__ = "0.9.0"
 
 _CONF = {}
 
@@ -94,10 +94,8 @@ def execute_sell(trade: Trade, current_rate: float) -> None:
     # Get available balance
     currency = trade.pair.split('_')[1]
     balance = exchange.get_balance(currency)
-    whitelist = _CONF[trade.exchange.name.lower()]['pair_whitelist']
 
     profit = trade.exec_sell_order(current_rate, balance)
-    whitelist.append(trade.pair)
     message = '*{}:* Selling [{}]({}) at rate `{:f} (profit: {}%)`'.format(
         trade.exchange.name,
         trade.pair.replace('_', '/'),
@@ -107,28 +105,6 @@ def execute_sell(trade: Trade, current_rate: float) -> None:
     )
     logger.info(message)
     telegram.send_msg(message)
-
-
-def should_sell(trade: Trade, current_rate: float, current_time: datetime) -> bool:
-    """
-    Based an earlier trade and current price and configuration, decides whether bot should sell
-    :return True if bot should sell at current rate
-    """
-    current_profit = (current_rate - trade.open_rate) / trade.open_rate
-
-    if 'stoploss' in _CONF and current_profit < float(_CONF['stoploss']):
-        logger.debug('Stop loss hit.')
-        return True
-
-    for duration, threshold in sorted(_CONF['minimal_roi'].items()):
-        duration, threshold = float(duration), float(threshold)
-        # Check if time matches and current rate is above threshold
-        time_diff = (current_time - trade.open_date).total_seconds() / 60
-        if time_diff > duration and current_profit > threshold:
-            return True
-
-    logger.debug('Threshold not reached. (cur_profit: %1.2f%%)', current_profit * 100.0)
-    return False
 
 
 def handle_trade(trade: Trade) -> None:
@@ -141,16 +117,28 @@ def handle_trade(trade: Trade) -> None:
             raise ValueError('attempt to handle closed trade: {}'.format(trade))
 
         logger.debug('Handling open trade %s ...', trade)
-
+        # Get current rate
         current_rate = exchange.get_ticker(trade.pair)['bid']
-        if should_sell(trade, current_rate, datetime.utcnow()):
+        current_profit = 100.0 * ((current_rate - trade.open_rate) / trade.open_rate)
+
+        if 'stoploss' in _CONF and current_profit < float(_CONF['stoploss']) * 100.0:
+            logger.debug('Stop loss hit.')
             execute_sell(trade, current_rate)
             return
 
+        for duration, threshold in sorted(_CONF['minimal_roi'].items()):
+            duration, threshold = float(duration), float(threshold)
+            # Check if time matches and current rate is above threshold
+            time_diff = (datetime.utcnow() - trade.open_date).total_seconds() / 60
+            if time_diff > duration and current_rate > (1 + threshold) * trade.open_rate:
+                execute_sell(trade, current_rate)
+                return
+
+        logger.debug('Threshold not reached. (cur_profit: %1.2f%%)', current_profit)
     except ValueError:
         logger.exception('Unable to handle open order')
 
-def get_target_bid(ticker: Dict[str, float]) -> float:
+def get_target_bid(ticker) -> float:
     """ Calculates bid target between current ask price and last price """
     if ticker['ask'] < ticker['last']:
         return ticker['ask']
