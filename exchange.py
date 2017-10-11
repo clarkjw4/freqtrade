@@ -71,8 +71,11 @@ def sell(pair: str, rate: float, amount: float) -> str:
     :param amount: The amount to sell
     :return: None
     """
+
     if _CONF['dry_run']:
         return 'dry_run'
+    elif amount == None:
+        raise RuntimeError('BITTREX: amount error')
     elif EXCHANGE == Exchange.BITTREX:
         data = _API.sell_limit(pair.replace('_', '-'), amount, rate)
         if not data['success']:

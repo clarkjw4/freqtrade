@@ -3,6 +3,7 @@ import json
 import logging
 import time
 import traceback
+import urllib.request, json
 from datetime import datetime
 from typing import Optional
 
@@ -43,7 +44,7 @@ def _process() -> None:
                 if trade:
                     Trade.session.add(trade)
                 else:
-                    logging.info('Got no buy signal...')
+                    logging.info('Streets askin too high...')
             except ValueError:
                 logger.exception('Unable to create trade')
 
@@ -65,6 +66,22 @@ def _process() -> None:
         msg = 'Got {} in _process()'.format(error.__class__.__name__)
         logger.exception(msg)
 
+def create_whitelist():
+    whitelist = []
+    blacklist = []
+    with urllib.request.urlopen("https://bittrex.com/api/v1.1/public/getmarketsummaries") as url:
+        data = json.loads(url.read().decode())
+        # print("Data: ", data['result'])
+             
+        for currency in data['result']:
+            base_vol = currency['BaseVolume']
+            market_name = currency['MarketName'].replace('-', '_')
+            if "BTC" in market_name and base_vol > 250 and market_name not in blacklist:
+                whitelist.append (market_name)
+
+    _CONF['bittrex']['pair_whitelist'] = whitelist
+    print (_CONF)
+            
 
 def close_trade_if_fulfilled(trade: Trade) -> bool:
     """
@@ -79,7 +96,7 @@ def close_trade_if_fulfilled(trade: Trade) -> bool:
             and trade.close_rate is not None \
             and trade.open_order_id is None:
         trade.is_open = False
-        logger.info('No open orders found and trade is fulfilled. Marking %s as closed ...', trade)
+        logger.info('Closed the deal! No open orders found and trade is fulfilled. Marking %s as closed ...', trade)
         return True
     return False
 
@@ -96,7 +113,7 @@ def execute_sell(trade: Trade, current_rate: float) -> None:
     balance = exchange.get_balance(currency)
 
     profit = trade.exec_sell_order(current_rate, balance)
-    message = '*{}:* Selling [{}]({}) at rate `{:f} (profit: {}%)`'.format(
+    message = '*{}:* Dumping [{}]({}) for `{:f} (profit: {}%)`'.format(
         trade.exchange.name,
         trade.pair.replace('_', '/'),
         exchange.get_pair_detail_url(trade.pair),
@@ -122,7 +139,7 @@ def handle_trade(trade: Trade) -> None:
         current_profit = 100.0 * ((current_rate - trade.open_rate) / trade.open_rate)
 
         if 'stoploss' in _CONF and current_profit < float(_CONF['stoploss']) * 100.0:
-            logger.debug('Stop loss hit.')
+            logger.debug('Fuck Market Crash...Stop Loss.')
             execute_sell(trade, current_rate)
             return
 
@@ -134,7 +151,7 @@ def handle_trade(trade: Trade) -> None:
                 execute_sell(trade, current_rate)
                 return
 
-        logger.debug('Threshold not reached. (cur_profit: %1.2f%%)', current_profit)
+        logger.debug('Need more gainz. (cur_profit: %1.2f%%)', current_profit)
     except ValueError:
         logger.exception('Unable to handle open order')
 
@@ -186,7 +203,7 @@ def create_trade(stake_amount: float, _exchange: exchange.Exchange) -> Optional[
     order_id = exchange.buy(pair, open_rate, amount)
 
     # Create trade entity and return
-    message = '*{}:* Buying [{}]({}) at rate `{:f}`'.format(
+    message = '*{}:* Scooping [{}]({}) for the low `{:f}`'.format(
         _exchange.name,
         pair.replace('_', '/'),
         exchange.get_pair_detail_url(pair),
@@ -260,13 +277,17 @@ def app(config: dict) -> None:
 if __name__ == '__main__':
     with open('config.json') as file:
         _CONF = json.load(file)
-       
 
-         # replace {key} and {secret}
-        keys = json.load(open('key.json')) 
-        for key in keys: 
-            _CONF[key] = keys[key]
+        # replace {key} and {secret}
+        keys = json.load(open('key.json'))
 
-        print(_CONF)
+        # Predefined names in key.json file
+        # TODO Is there a way to run through a loop on this?
+        _CONF['bittrex']['key'] = keys['key']
+        _CONF['bittrex']['secret'] = keys['secret']
+        _CONF['telegram']['token'] = keys['token']
+        _CONF['telegram']['chat_id'] = keys['chat_id']
+        
+        create_whitelist()
         validate(_CONF, CONF_SCHEMA)
         app(_CONF)

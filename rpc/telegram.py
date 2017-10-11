@@ -43,14 +43,15 @@ def init(config: dict) -> None:
         CommandHandler('stop', _stop),
         CommandHandler('forcesell', _forcesell),
         CommandHandler('performance', _performance),
+        CommandHandler('cancelorder', _cancelorder),
     ]
     for handle in handles:
         _updater.dispatcher.add_handler(handle)
     _updater.start_polling(
         clean=True,
         bootstrap_retries=3,
-        timeout=30,
-        read_latency=60,
+        timeout=60,
+        read_latency=120,
     )
     logger.info(
         'rpc.telegram is listening for following commands: %s',
@@ -298,7 +299,45 @@ def _performance(bot: Bot, update: Update) -> None:
     logger.debug(message)
     send_msg(message, parse_mode=ParseMode.HTML)
 
+@authorized_only
+def _cancelorder(bot: Bot, update: Update) -> None:
+    """
+    Handler for /forcesell <id>.
+    Sells the given trade at current price
+    :param bot: telegram bot
+    :param update: message update
+    :return: None
+    """
+    if get_state() != State.RUNNING:
+        send_msg('`trader is not running`', bot=bot)
+        return
 
+    try:
+        trade_id = int(update.message.text
+                       .replace('/cancelorder', '')
+                       .strip())
+ 
+        # Query for trade
+        trade = Trade.query.filter(and_(
+            Trade.id == trade_id,
+            Trade.is_open.is_(True)
+        )).first()
+        if not trade:
+            send_msg('There is no open trade with ID: `{}`'.format(trade_id))
+            return
+        # Cancel the order
+        exchange.cancel_order(trade_id)
+        message = '*{}:* Cancelling [{}]({})'.format(
+            trade.exchange.name,
+            trade.pair.replace('_', '/'),
+        )
+        logger.info(message)
+        send_msg(message)
+
+    except ValueError:
+        send_msg('Invalid argument. Usage: `/closeorder <trade_id>`')
+        logger.warning('/closeorder: Invalid argument received')
+        
 def send_msg(msg: str, bot: Bot = None, parse_mode: ParseMode = ParseMode.MARKDOWN) -> None:
     """
     Send given markdown message

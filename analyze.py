@@ -252,7 +252,7 @@ def plot_dataframe(dataframe: DataFrame, pair: str) -> None:
     fig.suptitle(pair, fontsize=14, fontweight='bold')
     ax1.plot(dataframe.index.values, dataframe['sar'], 'g_', label='pSAR')
     ax1.plot(dataframe.index.values, dataframe['close'], label='close')
-    # ax1.plot(dataframe.index.values, dataframe['sell'], 'ro', label='sell')
+    ax1.plot(dataframe.index.values, dataframe['sell'], 'ro', label='sell')
     ax1.plot(dataframe.index.values, dataframe['ema'], '--', label='EMA(20)')
     ax1.plot(dataframe.index.values, dataframe['buy'], 'bo', label='buy')
     ax1.legend()
