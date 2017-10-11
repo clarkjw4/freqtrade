@@ -48,6 +48,7 @@ def init(config: dict) -> None:
     for handle in handles:
         _updater.dispatcher.add_handler(handle)
     _updater.start_polling(
+        poll_interval=1.0,
         clean=True,
         bootstrap_retries=3,
         timeout=60,

@@ -66,9 +66,9 @@ def _process() -> None:
         msg = 'Got {} in _process()'.format(error.__class__.__name__)
         logger.exception(msg)
 
-def create_whitelist():
+def create_whitelist_blacklist():
     whitelist = []
-    blacklist = []
+    blacklist = ['BTC_RDD']
     with urllib.request.urlopen("https://bittrex.com/api/v1.1/public/getmarketsummaries") as url:
         data = json.loads(url.read().decode())
         # print("Data: ", data['result'])
@@ -80,7 +80,8 @@ def create_whitelist():
                 whitelist.append (market_name)
 
     _CONF['bittrex']['pair_whitelist'] = whitelist
-    print (_CONF)
+    _CONF['bittrex']['pair_blacklist'] = blacklist
+    # print (_CONF)
             
 
 def close_trade_if_fulfilled(trade: Trade) -> bool:
@@ -172,6 +173,8 @@ def create_trade(stake_amount: float, _exchange: exchange.Exchange) -> Optional[
     """
     logger.info('Creating new trade with stake_amount: %f ...', stake_amount)
     whitelist = _CONF[_exchange.name.lower()]['pair_whitelist']
+    blacklist = _CONF[_exchange.name.lower()]['pair_blacklist']
+
     # Check if stake_amount is fulfilled
     if exchange.get_balance(_CONF['stake_currency']) < stake_amount:
         raise ValueError(
@@ -187,6 +190,10 @@ def create_trade(stake_amount: float, _exchange: exchange.Exchange) -> Optional[
         if trade.pair in whitelist:
             whitelist.remove(trade.pair)
             logger.debug('Ignoring %s in pair whitelist', trade.pair)
+
+    for items in blacklist:
+        logger.debug('Ignoring %s in pair whitelist', items)
+
     if not whitelist:
         raise ValueError('No pair in whitelist')
 
@@ -288,6 +295,6 @@ if __name__ == '__main__':
         _CONF['telegram']['token'] = keys['token']
         _CONF['telegram']['chat_id'] = keys['chat_id']
         
-        create_whitelist()
+        create_whitelist_blacklist()
         validate(_CONF, CONF_SCHEMA)
         app(_CONF)
