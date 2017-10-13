@@ -12,6 +12,7 @@ from misc import get_state, State, update_state
 from persistence import Trade
 
 import exchange
+import main
 
 # Remove noisy log messages
 logging.getLogger('requests.packages.urllib3').setLevel(logging.INFO)
@@ -224,6 +225,7 @@ def _stop(bot: Bot, update: Update) -> None:
         send_msg('*Status:* `already stopped`', bot=bot)
 
 
+# TODO Fix SQlite Bug
 @authorized_only
 def _forcesell(bot: Bot, update: Update) -> None:
     """
@@ -265,6 +267,7 @@ def _forcesell(bot: Bot, update: Update) -> None:
         )
         logger.info(message)
         send_msg(message)
+        main.close_trade_if_fulfilled(trade)
 
     except ValueError:
         send_msg('Invalid argument. Usage: `/forcesell <trade_id>`')
@@ -300,11 +303,12 @@ def _performance(bot: Bot, update: Update) -> None:
     logger.debug(message)
     send_msg(message, parse_mode=ParseMode.HTML)
 
+#TODO Fix Method
 @authorized_only
 def _cancelorder(bot: Bot, update: Update) -> None:
     """
-    Handler for /forcesell <id>.
-    Sells the given trade at current price
+    Handler for /cancelorder <id>.
+    Cancels the given trade
     :param bot: telegram bot
     :param update: message update
     :return: None
@@ -323,17 +327,21 @@ def _cancelorder(bot: Bot, update: Update) -> None:
             Trade.id == trade_id,
             Trade.is_open.is_(True)
         )).first()
+
+        print (trade.pair)
+
         if not trade:
             send_msg('There is no open trade with ID: `{}`'.format(trade_id))
             return
         # Cancel the order
-        exchange.cancel_order(trade_id)
-        message = '*{}:* Cancelling [{}]({})'.format(
+        exchange.cancel_order(trade.open_order_id)
+        message = '*{}:* Cancelling [{}]'.format(
             trade.exchange.name,
             trade.pair.replace('_', '/'),
         )
         logger.info(message)
         send_msg(message)
+        exchange.cancel_order(trade.open_order_id)
 
     except ValueError:
         send_msg('Invalid argument. Usage: `/closeorder <trade_id>`')

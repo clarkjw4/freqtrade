@@ -37,6 +37,7 @@ def _process() -> None:
     try:
         # Query trades from persistence layer
         trades = Trade.query.filter(Trade.is_open.is_(True)).all()
+        # TODO Add BTC Current < Open
         if len(trades) < _CONF['max_open_trades']:
             try:
                 # Create entity and execute trade
@@ -75,8 +76,9 @@ def create_whitelist_blacklist():
              
         for currency in data['result']:
             base_vol = currency['BaseVolume']
+            bid_price = currency['Last']
             market_name = currency['MarketName'].replace('-', '_')
-            if "BTC" in market_name and base_vol > 250 and market_name not in blacklist:
+            if "BTC" in market_name and base_vol > 250 and bid_price > 0.000001 and market_name not in blacklist:
                 whitelist.append (market_name)
 
     _CONF['bittrex']['pair_whitelist'] = whitelist

@@ -8,6 +8,7 @@ import talib.abstract as ta
 import talib
 import pandas as pd
 import numpy as np
+import math
 
 
 logging.basicConfig(level=logging.DEBUG,
@@ -28,7 +29,7 @@ def get_ticker(pair: str, minimum_date: arrow.Arrow) -> dict:
     }
     params = {
         'marketName': pair.replace('_', '-'),
-        'tickInterval': 'oneMin',
+        'tickInterval': 'fiveMin',
         '_': minimum_date.timestamp * 1000
     }
     data = requests.get(url, params=params, headers=headers).json()
@@ -54,6 +55,10 @@ def populate_indicators(dataframe: DataFrame) -> DataFrame:
     """
     Adds several different TA indicators to the given DataFrame
     """
+
+    #Determine Trend
+    dataframe = TREND(dataframe)
+
     #Exponential Moving Average
     dataframe['ema'] = ta.EMA(dataframe, timeperiod=33)
 
@@ -62,6 +67,12 @@ def populate_indicators(dataframe: DataFrame) -> DataFrame:
 
     #Average Directional Movement Index
     dataframe['adx'] = ta.ADX(dataframe)
+
+    #MACD
+    macd = ta.MACD(dataframe)
+    dataframe['macd'] = macd['macd']
+    dataframe['macds'] = macd['macdsignal']
+    dataframe['macdh'] = macd['macdhist']
 
     #Relative Strength Index
     dataframe['rsi'] = ta.RSI(dataframe, 14)
@@ -83,13 +94,40 @@ def populate_indicators(dataframe: DataFrame) -> DataFrame:
 
     # if Counter.counter < 30:
     #     print(dataframe)
+    #     print (macd)
+    #     print (dataframe ['adx'])
     #     Counter.counter = Counter.counter + 1
-    #
+    
     # else:
     #     exit()
-    #
+    
     return dataframe
 
+
+# Trend
+def TREND(df):
+    df['Trend'] = None
+    df['Trend_Amount'] = None
+    df['Trend_Direction'] = None
+    
+
+    for row in range(1, len(df)):
+        if(df['close'].iloc[row] < df['open'].iloc[row]):
+            df['Trend'].iloc[row] = -1
+        else:
+            df['Trend'].iloc[row] = 1
+
+        df['Trend_Amount'].iloc[row] = df['close'].iloc[row] - df['open'].iloc[row]
+
+        if df['Trend_Amount'].iloc[row] is not None:
+            df['Trend_Direction'].iloc[row] = df['Trend_Amount'].iloc[row]
+            
+            if df['Trend_Direction'].iloc[row - 1] is not None:
+                df['Trend_Direction'].iloc[row] += df['Trend_Direction'].iloc[row - 1]
+            #if df['Trend_Amount'].iloc[row - 1] is not None:
+            #    df['Trend_Direction'].iloc[row] += df['Trend_Amount'].iloc[row-1]
+    
+    return df
 # RSI
 def RSI (df):
 
@@ -97,7 +135,7 @@ def RSI (df):
 
     for row in range(len(df)):
 
-        if (df['rsi'].iloc[row] < 20.0):
+        if (df['rsi'].iloc[row] < 15.0):
             df['PositionRSI'].iloc[row] = 1
 
         else:
@@ -127,7 +165,7 @@ def STOCH(df):
 
     for row in range(len(df)):
 
-        if (df['K'].iloc[row] < 20.0) and (df['D'].iloc[row] < 20.0):
+        if (df['K'].iloc[row] < 15.0) and (df['D'].iloc[row] < 15.0):
             df['PositionSTOCH'].iloc[row] = 1
 
         else:
@@ -187,6 +225,10 @@ def populate_buy_trend(dataframe: DataFrame) -> DataFrame:
         # (dataframe['swap'] == 1) &
         # (dataframe['upswing'] == 1) &
         # (dataframe['adx'] > 25) & # adx over 25 tells there's enough momentum
+        # (dataframe['macd'] > dataframe['macds']) &
+        # (dataframe['Trend'] == 1) &
+        (dataframe['Trend_Amount'] > 0) &
+        (dataframe['Trend_Direction'] > 0) &
         (dataframe['PositionBBANDS'] == 1) &
         (dataframe['PositionSTOCH'] == 1) &
         (dataframe['PositionRSI'] == 1),
