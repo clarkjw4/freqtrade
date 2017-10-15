@@ -22,43 +22,16 @@
     },
     "bittrex": {
         "enabled": true,
-        "key": "229ffddf5e0e4350b5bc70dab7cde154",
-        "secret": "e05ba73424c34ad28210dcd5ae9aaf0c",
+        "key": "",
+        "secret": "",
         "pair_whitelist": [
-                    "BTC_RLC",
-                    "BTC_TKN",
-                    "BTC_TRST",
-                    "BTC_SWT",
-                    "BTC_PIVX",
-                    "BTC_MLN",
-                    "BTC_XZC",
-                    "BTC_TIME",
-                    "BTC_LUN",
-                    "BTC_NEO",
-                    "BTC_OMG",
-                    "BTC_QTUM",
-                    "BTC_GNT",
-                    "BTC_LTC",
-                    "BTC_BTCD",
-                    "BTC_SNT",
-                    "BTC_BTS",
-                    "BTC_DGB",
-                    "BTC_XRP",
-                    "BTC_ADX",
-                    "BTC_LGD",
-                    "BTC_OK",
-                    "BTC_NAV",
-                    "BTC_XVG",
-                    "BTC_KMD",
-                    "BTC_MTL",
-                    "BTC_BCC"
 
         ]
     },
     "telegram": {
         "enabled": true,
-        "token": "406738704:AAELHVuVP9CQaOyTPh3j2Em66ZRxbdpRao8",
-        "chat_id": "336462843"
+        "token": "",
+        "chat_id": ""
     },
     "initial_state": "running"
 }

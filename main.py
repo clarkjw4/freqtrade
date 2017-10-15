@@ -69,7 +69,7 @@ def _process() -> None:
 
 def create_whitelist_blacklist():
     whitelist = []
-    blacklist = ['BTC_RDD']
+    blacklist = []
     with urllib.request.urlopen("https://bittrex.com/api/v1.1/public/getmarketsummaries") as url:
         data = json.loads(url.read().decode())
         # print("Data: ", data['result'])
