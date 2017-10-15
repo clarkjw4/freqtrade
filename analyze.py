@@ -109,7 +109,6 @@ def TREND(df):
     df['Trend'] = None
     df['Trend_Amount'] = None
     df['Trend_Direction'] = None
-    
 
     for row in range(1, len(df)):
         if(df['close'].iloc[row] < df['open'].iloc[row]):
@@ -126,8 +125,9 @@ def TREND(df):
                 df['Trend_Direction'].iloc[row] += df['Trend_Direction'].iloc[row - 1]
             #if df['Trend_Amount'].iloc[row - 1] is not None:
             #    df['Trend_Direction'].iloc[row] += df['Trend_Amount'].iloc[row-1]
-    
+   
     return df
+
 # RSI
 def RSI (df):
 
@@ -135,7 +135,7 @@ def RSI (df):
 
     for row in range(len(df)):
 
-        if (df['rsi'].iloc[row] < 15.0):
+        if (df['rsi'].iloc[row] < 20.0):
             df['PositionRSI'].iloc[row] = 1
 
         else:
@@ -165,7 +165,7 @@ def STOCH(df):
 
     for row in range(len(df)):
 
-        if (df['K'].iloc[row] < 15.0) and (df['D'].iloc[row] < 15.0):
+        if (df['K'].iloc[row] < 20.0) and (df['D'].iloc[row] < 20.0):
             df['PositionSTOCH'].iloc[row] = 1
 
         else:
@@ -226,9 +226,7 @@ def populate_buy_trend(dataframe: DataFrame) -> DataFrame:
         # (dataframe['upswing'] == 1) &
         # (dataframe['adx'] > 25) & # adx over 25 tells there's enough momentum
         # (dataframe['macd'] > dataframe['macds']) &
-        # (dataframe['Trend'] == 1) &
-        (dataframe['Trend_Amount'] > 0) &
-        (dataframe['Trend_Direction'] > 0) &
+        (dataframe['Trend'].tail(3) == -1) &
         (dataframe['PositionBBANDS'] == 1) &
         (dataframe['PositionSTOCH'] == 1) &
         (dataframe['PositionRSI'] == 1),
