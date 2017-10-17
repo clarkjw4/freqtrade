@@ -335,7 +335,7 @@ def _cancelorder(bot: Bot, update: Update) -> None:
             return
         # Cancel the order - According to test/test_main.py Line 84
         closed = close_trade_if_fulfilled(trade)
-        if closed not True:
+        if closed is not True:
             raise RuntimeError('BITTREX: {}'.format(data['message']))
         #exchange.cancel_order(trade.open_order_id)
         message = '*{}:* Cancelling [{}]'.format(

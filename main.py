@@ -69,7 +69,7 @@ def _process() -> None:
 
 def create_whitelist_blacklist():
     whitelist = []
-    blacklist = []
+    blacklist = ['USDT_BTC']
     with urllib.request.urlopen("https://bittrex.com/api/v1.1/public/getmarketsummaries") as url:
         data = json.loads(url.read().decode())
         # print("Data: ", data['result'])
@@ -78,7 +78,7 @@ def create_whitelist_blacklist():
             base_vol = currency['BaseVolume']
             bid_price = currency['Last']
             market_name = currency['MarketName'].replace('-', '_')
-            if "BTC" in market_name and base_vol > 250 and bid_price > 0.000001 and market_name not in blacklist:
+            if "BTC" in market_name and base_vol > 200 and bid_price > 0.000001 and market_name not in blacklist:
                 whitelist.append (market_name)
 
     _CONF['bittrex']['pair_whitelist'] = whitelist
