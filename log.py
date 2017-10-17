@@ -3,11 +3,19 @@ class Logger():
 	# Store the information in a csv file to be opened in Excel
 	file_name = "log.csv"
 
-	with open(file_name) as file:
-		file.write("column,names,delimitted,by,commas")
-		file.write("\n")
+	def init(self):
+		with open(file_name) as file:
+			file.write("Time,TradeCount,BestPerformingTrade,AverageDuration,ROI,"
+						+ "BTCValue(Wallet),USDValue(Wallet),PriceOfBTC,ErrorLogs")
+			file.write("\n")
 
-	def write_to(self, text):
-		with open(self.file_name) as file:
+	def log(self, text):
+		try:
+			with open(self.file_name) as file:
+				file.write(text)
+				file.write("\n")
+		except IOError as e:
+			init()
 			file.write(text)
 			file.write("\n")
+		
