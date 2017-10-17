@@ -1,5 +1,6 @@
 import logging
 from datetime import timedelta
+import datetime
 from typing import Callable, Any
 
 import arrow
@@ -13,6 +14,7 @@ from persistence import Trade
 
 import exchange
 import main
+import log
 
 # Remove noisy log messages
 logging.getLogger('requests.packages.urllib3').setLevel(logging.INFO)
@@ -21,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 _updater = None
 _CONF = {}
+logger = log.Logger()
 
 
 def init(config: dict) -> None:
@@ -45,6 +48,7 @@ def init(config: dict) -> None:
         CommandHandler('forcesell', _forcesell),
         CommandHandler('performance', _performance),
         CommandHandler('cancelorder', _cancelorder),
+        CommandHandler('log', _log),
     ]
     for handle in handles:
         _updater.dispatcher.add_handler(handle)
@@ -192,6 +196,60 @@ def _profit(bot: Bot, update: Update) -> None:
         best_rate=round(bp_rate, 2),
     )
     send_msg(markdown_msg, bot=bot)
+
+@authorized_only
+def _log(bot: Bot, update: Update) -> None:
+    """
+    Handler for /log
+    Logs to a csv file profit statistics among other things (unknown right now)
+    :param bot: telegram bot
+    :param update: message update
+    :return: None
+    """
+    trades = Trade.query.order_by(Trade.id).all()
+    
+    profit_amounts = []
+    profits = []
+    durations = []
+    for trade in trades:
+        if trade.close_date:
+            durations.append((trade.close_date - trade.open_date).total_seconds())
+        if trade.close_profit:
+            profit = trade.close_profit
+        else:
+            # Get current rate
+            current_rate = exchange.get_ticker(trade.pair)['bid']
+            profit = 100 * ((current_rate - trade.open_rate) / trade.open_rate)
+
+        profit_amounts.append((profit / 100) * trade.stake_amount)
+        profits.append(profit)
+
+    best_pair = Trade.session.query(Trade.pair, func.sum(Trade.close_profit).label('profit_sum')) \
+        .filter(Trade.is_open.is_(False)) \
+        .group_by(Trade.pair) \
+        .order_by(text('profit_sum DESC')) \
+        .first()
+
+    now = datetime.datetime.now()
+
+    bp_pair, bp_rate = best_pair
+    markdown_msg = "{date},{time},{trade_count},{best_pair}: {best_rate:.2f}%,"
+            + "{avg_duration},{profit_btc:.2f} ({profit:.2f}%),"
+            + "{btc_wallet}BTC ({usd_wallet}USD),{price_btc}".format(
+        date=now.month + "/" + now.day + "/" + now.year,
+        time=now.hour + ":" + now.minute + ":" + now.second,
+        trade_count=len(trades),
+        best_pair=bp_pair,
+        best_rate=round(bp_rate, 2),
+        avg_duration=str(timedelta(seconds=sum(durations) / float(len(durations)))).split('.')[0],
+        profit_btc=round(sum(profit_amounts), 8),
+        profit=round(sum(profits), 2),
+        btc_wallet=0.0,
+        usd_wallet=0.0,
+        price_btc=0.0,
+        #btc_wallet,usd_wallet and price_btc are not implemented yet
+    )
+    logger.log(markdown_msg)
 
 
 @authorized_only
