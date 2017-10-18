@@ -1,0 +1,4 @@
+Date,Time,TradeCount,BestPerformingTrade,AverageDuration,ROI,BTCValue/USDValue(Wallet),PriceOfBTC,ErrorLogs
+10/17/2017,14:28:6,6,BTC_RBY: 2.18%,1:14:06,0.00 (4.00%),0.0BTC (0.0USD),0.0
+10/17/2017,22:16:34,7,BTC_DGB: 2.77%,1:12:43,0.00 (5.65%),0.0BTC (0.0USD),0.0
+10/17/2017,22:18:56,7,BTC_DGB: 2.77%,1:12:43,0.00 (5.65%),0.0BTC (0.0USD),0.0

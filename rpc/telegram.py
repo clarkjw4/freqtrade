@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 _updater = None
 _CONF = {}
-logger = log.Logger()
+btc_logger = log.Logger()
 
 
 def init(config: dict) -> None:
@@ -233,11 +233,9 @@ def _log(bot: Bot, update: Update) -> None:
     now = datetime.datetime.now()
 
     bp_pair, bp_rate = best_pair
-    markdown_msg = "{date},{time},{trade_count},{best_pair}: {best_rate:.2f}%,"
-            + "{avg_duration},{profit_btc:.2f} ({profit:.2f}%),"
-            + "{btc_wallet}BTC ({usd_wallet}USD),{price_btc}".format(
-        date=now.month + "/" + now.day + "/" + now.year,
-        time=now.hour + ":" + now.minute + ":" + now.second,
+    markdown_msg = "{date},{time},{trade_count},{best_pair}: {best_rate:.2f}%,{avg_duration},{profit_btc:.2f} ({profit:.2f}%),{btc_wallet}BTC ({usd_wallet}USD),{price_btc}".format(
+        date=str(now.month) + "/" + str(now.day) + "/" + str(now.year),
+        time=str(now.hour) + ":" + str(now.minute) + ":" + str(now.second),
         trade_count=len(trades),
         best_pair=bp_pair,
         best_rate=round(bp_rate, 2),
@@ -249,7 +247,8 @@ def _log(bot: Bot, update: Update) -> None:
         price_btc=0.0,
         #btc_wallet,usd_wallet and price_btc are not implemented yet
     )
-    logger.log(markdown_msg)
+    btc_logger.log(markdown_msg)
+    send_msg('Log Created :)')
 
 
 @authorized_only
