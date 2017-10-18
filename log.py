@@ -1,23 +1,54 @@
 import os
+import message
+import telegram
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
+messager = message.Message()
 
 class Logger():
 
 	# Store the information in a csv file to be opened in Excel
 	file_name = "log.csv"
+	scheduler = None
 
-	def init(self):
-		file = open(self.file_name, 'w')
-		file.write("Date,Time,TradeCount,BestPerformingTrade,AverageDuration,ROI,BTCValue/USDValue(Wallet),PriceOfBTC,ErrorLogs")
-		file.write("\n")
-		file.close ()
+	def __init__(self, a_file_name = "log.csv"):
+		self.file_name = a_file_name
+		self.scheduler = BackgroundScheduler()
+
+	def initialize_log_file(self):
+		with open(self.file_name, 'w') as file:
+			file.write("Date,Time,TradeCount,BestPerformingTrade,AverageDuration,ROI,BTCValue/USDValue(Wallet),PriceOfBTC,ErrorLogs")
+			file.write("\n")
 
 	def log(self, text):
 		if os.path.exists(self.file_name):
 			pass
-
 		else:
-			self.init()
+			self.initialize_log_file()
 			
 		with open(self.file_name, 'a') as file:
 			file.write(text)
 			file.write("\n")
+
+	def auto_log(self):
+
+    	trades = Trade.query.order_by(Trade.id).all()
+		message = messager.get_log(trades)
+		self.log(message)
+
+
+	def start_scheduled_log(self, time= 6, trades):# -> BackgroundScheduler():
+		
+		if self.scheduler is None:
+			self.scheduler = BackgroundScheduler()
+
+		if not self.scheduler.running:
+			self.scheduler.add_job(self.auto_log(), 'interval', hours=time)
+			self.scheduler.start()
+
+			#return self.scheduler
+
+	def stop_scheduled_log(self):
+		if self.scheduler.running:
+			self.scheduler.shutdown()
