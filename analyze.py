@@ -36,9 +36,6 @@ def get_ticker(pair: str, minimum_date: arrow.Arrow) -> dict:
         'tickInterval': 'fiveMin',
         '_': minimum_date.timestamp * 1000
     }
-    data = requests.get(url, params=params, headers=headers).json()
-    if not data['success']:
-        raise RuntimeError('BITTREX: {}'.format(data['message']))
     
     response = requests.get(url, params=params, headers=headers)
 
@@ -51,6 +48,15 @@ def get_ticker(pair: str, minimum_date: arrow.Arrow) -> dict:
     except:
         logger.debug("JSON doesn't exist or gave an unexplainable bug. Message: {0}".format(data))
         raise RuntimeError('JSON does not exist.')
+
+def get_btc_current_price():
+    # returns the current btc price in USD
+    url = "https://api.coindesk.com/v1/bpi/currentprice.json"
+    
+    data = requests.get(url).json()
+
+    return data['bpi']['USD']['rate_float']
+
 
 def parse_ticker_dataframe(ticker: list, minimum_date: arrow.Arrow) -> DataFrame:
     """
