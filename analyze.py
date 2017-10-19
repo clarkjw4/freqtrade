@@ -49,7 +49,8 @@ def get_ticker(pair: str, minimum_date: arrow.Arrow) -> dict:
             raise RuntimeError('BITTREX: {}'.format(data['message']))
         return data
     except:
-        logger.debug("JSON doesn't exist or gave an unexplainable bug.")
+        logger.debug("JSON doesn't exist or gave an unexplainable bug. Message: {0}".format(data))
+        raise RuntimeError('JSON does not exist.')
 
 def parse_ticker_dataframe(ticker: list, minimum_date: arrow.Arrow) -> DataFrame:
     """
