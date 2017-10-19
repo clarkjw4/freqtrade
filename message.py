@@ -138,8 +138,8 @@ class Message:
 			avg_duration=str(timedelta(seconds=sum(durations) / float(len(durations)))).split('.')[0],
 			profit_btc=round(sum(profit_amounts), 8),
 			profit=round(sum(profits), 2),
-			btc_wallet=balance_btc,
-			usd_wallet=balances[],
+			btc_wallet=0.0,
+			usd_wallet=0.0,
 			price_btc=0.0,
 			#btc_wallet,usd_wallet and price_btc are not implemented yet
 		)
