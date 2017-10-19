@@ -157,6 +157,19 @@ class Message:
 
 		return markdown_msg
 
+	def get_order_log(self):
+		data = exchange.get_order_log()
+
+		markdown_msg = "{time},{exchange},{ordertype},{price},{orderid}".format(
+			time=data['TimeStamp'],
+			exchange=data['Exchange'],
+			ordertype=data['OrderType'],
+			price=data['Price'],
+			orderid=data['OrderUuid'],
+		)
+
+		return markdown_msg
+
 	def get_forcesell(self, trade):
 
 		# Get current rate

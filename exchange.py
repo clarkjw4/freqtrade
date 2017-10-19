@@ -180,8 +180,31 @@ def get_markets() -> List[str]:
     Returns all available markets
     :return: list of all available pairs
     """
-    if EXCHANGE == Exchange. BITTREX:
+    if EXCHANGE == Exchange.BITTREX:
         data = _API.get_markets()
         if not data['success']:
             raise RuntimeError('BITTREX: {}'.format(data['message']))
         return [m['MarketName'].replace('-', '_') for m in data['result']]
+
+def get_order_history():
+    """
+    Returns your order history
+    """
+    if EXCHANGE == Exchange.BITTREX:
+        data = _API.get_order_history()
+        if not data['success']:
+            raise RuntimeError('BITTREX: {}'.format(data['message']))
+        # Contains OrderUuid, Exchange, TimeStamp, OrderType, Price
+        formatted_data = []
+
+        for d in data['result']:
+            dict_data = {}
+            dict_data['OrderUuid'] = d['OrderUuid']
+            dict_data['Exchange'] = d['Exchange']
+            dict_data['TimeStamp'] = d['TimeStamp']
+            dict_data['OrderType'] = d['OrderType']
+            dict_data['Price'] = d['Price']
+
+            formatted_data.append(dict_data)
+            
+        return formatted_data
