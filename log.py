@@ -2,6 +2,7 @@ import os
 import message
 import telegram
 
+from persistence import Trade
 from apscheduler.schedulers.background import BackgroundScheduler
 
 messager = message.Message()
@@ -33,20 +34,21 @@ class Logger():
 
 	def auto_log(self):
 
-    	trades = Trade.query.order_by(Trade.id).all()
+		trades = Trade.query.order_by(Trade.id).all()
 		message = messager.get_log(trades)
 		self.log(message)
 
 
-	def start_scheduled_log(self, time= 6, trades):# -> BackgroundScheduler():
+	def start_scheduled_log(self, time=6):# -> BackgroundScheduler():
 		
 		if self.scheduler is None:
 			self.scheduler = BackgroundScheduler()
 
 		if not self.scheduler.running:
-			self.scheduler.add_job(self.auto_log(), 'interval', hours=time)
+			self.scheduler.add_job(self.auto_log, 'interval', hours=time)
 			self.scheduler.start()
 
+		self.auto_log()		
 			#return self.scheduler
 
 	def stop_scheduled_log(self):

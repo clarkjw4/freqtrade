@@ -1,10 +1,7 @@
 import logging
-from datetime import timedelta
 import datetime
 from typing import Callable, Any
 
-import arrow
-from sqlalchemy import and_, func, text
 from telegram.error import NetworkError
 from telegram.ext import CommandHandler, Updater
 from telegram import ParseMode, Bot, Update
@@ -25,7 +22,7 @@ logger = logging.getLogger(__name__)
 _updater = None
 _CONF = {}
 btc_logger = log.Logger()
-messaging = message.Message()
+messager = message.Message()
 
 
 def init(config: dict) -> None:
@@ -139,7 +136,7 @@ def _log(bot: Bot, update: Update) -> None:
     
     markdown_msg = messager.get_log(trades)
     btc_logger.log(markdown_msg)
-    send_msg('Log Created :)')
+    send_msg('Log Created')
 
 @authorized_only
 def _schedule_log(bot: Bot, update: Update) -> None:
@@ -150,7 +147,7 @@ def _schedule_log(bot: Bot, update: Update) -> None:
                        .strip())
 
         btc_logger.start_scheduled_log(time)
-        send_msg('Auto-Generate logs every {0} hours'.format(time))
+        send_msg('Auto-Generate logs every {0} hour(s)'.format(time))
 
     except ValueError:
         send_msg('Invalid argument. Usage: `/schedulelog <time [in hours]>`')
@@ -159,6 +156,7 @@ def _schedule_log(bot: Bot, update: Update) -> None:
 @authorized_only
 def _stop_log(bot: Bot, update: Update) -> None:
     btc_logger.stop_scheduled_log()
+    send_msg('Scheduled log has been canceled')
 
 @authorized_only
 def _start(bot: Bot, update: Update) -> None:
@@ -248,7 +246,7 @@ def _performance(bot: Bot, update: Update) -> None:
         .order_by(text('profit_sum DESC')) \
         .all()
 
-    message = messager.get_performance()
+    message = messager.get_performance(pair_rates)
     logger.debug(message)
     send_msg(message, parse_mode=ParseMode.HTML)
 

@@ -35,7 +35,18 @@ def get_ticker(pair: str, minimum_date: arrow.Arrow) -> dict:
     data = requests.get(url, params=params, headers=headers).json()
     if not data['success']:
         raise RuntimeError('BITTREX: {}'.format(data['message']))
-    return data
+    
+    response = requests.get(url, params=params, headers=headers)
+
+    try:
+        data = response.json()
+
+        if not data['success']:
+            raise RuntimeError('BITTREX: {}'.format(data['message']))
+        return data
+    except:
+        logger.debug("JSON doesn't exist or gave an unexplainable bug.")
+
 
 
 def parse_ticker_dataframe(ticker: list, minimum_date: arrow.Arrow) -> DataFrame:
