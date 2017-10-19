@@ -97,6 +97,20 @@ def get_balance(currency: str) -> float:
             raise RuntimeError('BITTREX: {}'.format(data['message']))
         return float(data['result']['Balance'] or 0.0)
 
+def get_balances():
+    """
+    Get account balance.
+    :param currency: currency as str, format: BTC
+    :return: float
+    """
+    if _CONF['dry_run']:
+        return None
+    elif EXCHANGE == Exchange.BITTREX:
+        data = _API.get_balances()
+        if not data['success']:
+            raise RuntimeError('BITTREX: {}'.format(data['message']))
+        return float(data['result'] or None)
+
 
 def get_ticker(pair: str) -> dict:
     """

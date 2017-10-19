@@ -47,8 +47,6 @@ def get_ticker(pair: str, minimum_date: arrow.Arrow) -> dict:
     except:
         logger.debug("JSON doesn't exist or gave an unexplainable bug.")
 
-
-
 def parse_ticker_dataframe(ticker: list, minimum_date: arrow.Arrow) -> DataFrame:
     """
     Analyses the trend for the given pair

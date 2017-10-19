@@ -1,6 +1,7 @@
 import os
 import message
 import telegram
+import exchange
 
 from persistence import Trade
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -35,7 +36,8 @@ class Logger():
 	def auto_log(self):
 
 		trades = Trade.query.order_by(Trade.id).all()
-		message = messager.get_log(trades)
+		balances = exchange.get_balances()
+		message = messager.get_log(trades, balances)
 		self.log(message)
 
 
