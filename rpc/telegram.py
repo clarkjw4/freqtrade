@@ -140,7 +140,9 @@ def _log(bot: Bot, update: Update) -> None:
     send_msg('Log (Trades) Created')
 
     # Order Logs
-    order_message = messager.get_order_log()
+    data = exchange.get_order_log()
+    limit = self.limit_order_log()
+    order_message = messager.get_order_log(data[limit:])
     btc_logger.log(message, "order_log.csv")
     send_msg('Log (Orders) Created')
 

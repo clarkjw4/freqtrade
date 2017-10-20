@@ -157,8 +157,7 @@ class Message:
 
 		return markdown_msg
 
-	def get_order_log(self):
-		data = exchange.get_order_log()
+	def get_order_log(self, data):
 
 		markdown_msg = "{time},{exchange},{ordertype},{price},{orderid}".format(
 			time=data['TimeStamp'],
