@@ -1,7 +1,7 @@
 class Indicator:
 
 	# Trend
-	def TREND(df):
+	def TREND(self, df):
 		df['Trend'] = None
 		df['Trend_Amount'] = None
 		df['Trend_Direction'] = None
@@ -25,7 +25,7 @@ class Indicator:
 		return df
 
 	# RSI
-	def RSI (df):
+	def RSI (self, df):
 
 		df['PositionRSI'] = None
 
@@ -40,13 +40,13 @@ class Indicator:
 		return df
 
 	# Stochcastic
-	def STOK(df, n):
+	def STOK(self, df, n):
 		STOK = ((df['close'] - pd.rolling_min(df['low'], n)) /
 		(pd.rolling_max(df['high'], n) - pd.rolling_min(df['low'], n))) * 100
 
 		return STOK
 
-	def STOD(df, n):
+	def STOD(self, df, n):
 		STOK = ((df['close'] - pd.rolling_min(df['low'], n)) /
 		(pd.rolling_max(df['high'], n) - pd.rolling_min(df['low'], n))) * 100
 
@@ -54,7 +54,7 @@ class Indicator:
 
 		return STOD
 
-	def STOCH(df):
+	def STOCH(self, df):
 
 		#Create an "empty" column as placeholder for our /position signal
 		df['PositionSTOCH'] = None
@@ -71,7 +71,7 @@ class Indicator:
 
 
 	# Working Bollinger Bands
-	def BBANDS(k, df, n):
+	def BBANDS(self, k, df, n):
 		MA = pd.stats.moments.rolling_mean(df['close'],k)
 		MSD = pd.stats.moments.rolling_std(df['close'],k)
 		df['upper'] = MA + (MSD*n)
