@@ -5,6 +5,7 @@ from typing import Callable, Any
 from telegram.error import NetworkError
 from telegram.ext import CommandHandler, Updater
 from telegram import ParseMode, Bot, Update
+from sqlalchemy import and_, func, text
 
 from misc import get_state, State, update_state
 from persistence import Trade

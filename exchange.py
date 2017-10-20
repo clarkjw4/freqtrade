@@ -109,7 +109,15 @@ def get_balances():
         data = _API.get_balances()
         if not data['success']:
             raise RuntimeError('BITTREX: {}'.format(data['message']))
-        return float(data['result'] or None)
+
+        limit_data = []
+        for d in data['result']:
+            if d['Balance'] != 0.0:
+                limit_data.append(d)
+
+        print(limit_data)       
+        return limit_data
+
 
 
 def get_ticker(pair: str) -> dict:
