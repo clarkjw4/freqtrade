@@ -4,6 +4,7 @@ from sqlalchemy import and_, func, text
 import arrow
 import datetime
 import exchange
+import analyze
 
 
 class Message:
@@ -128,6 +129,16 @@ class Message:
 
 		now = datetime.datetime.now()
 
+		btc_wallet_balance = 0.0
+		for balance in balances:
+			if balance['Currency'] == "BTC":
+				btc_wallet_balance = balance['Balance']
+
+		# In USD
+		current_btc_price = analyze.get_btc_current_price()
+
+		usd_wallet_balance = btc_wallet_balance * current_btc_price
+
 		bp_pair, bp_rate = best_pair
 		markdown_msg = "{date},{time},{trade_count},{best_pair}: {best_rate:.2f}%,{avg_duration},{profit_btc:.2f} ({profit:.2f}%),{btc_wallet}BTC ({usd_wallet}USD),{price_btc}".format(
 			date=str(now.month) + "/" + str(now.day) + "/" + str(now.year),
@@ -138,10 +149,23 @@ class Message:
 			avg_duration=str(timedelta(seconds=sum(durations) / float(len(durations)))).split('.')[0],
 			profit_btc=round(sum(profit_amounts), 8),
 			profit=round(sum(profits), 2),
-			btc_wallet=0.0,
-			usd_wallet=0.0,
-			price_btc=0.0,
+			btc_wallet=btc_wallet_balance,
+			usd_wallet=usd_wallet_balance,
+			price_btc=current_btc_price,
 			#btc_wallet,usd_wallet and price_btc are not implemented yet
+		)
+
+		return markdown_msg
+
+	def get_order_log(self):
+		data = exchange.get_order_log()
+
+		markdown_msg = "{time},{exchange},{ordertype},{price},{orderid}".format(
+			time=data['TimeStamp'],
+			exchange=data['Exchange'],
+			ordertype=data['OrderType'],
+			price=data['Price'],
+			orderid=data['OrderUuid'],
 		)
 
 		return markdown_msg

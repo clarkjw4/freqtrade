@@ -137,7 +137,12 @@ def _log(bot: Bot, update: Update) -> None:
     
     markdown_msg = messager.get_log(trades)
     btc_logger.log(markdown_msg)
-    send_msg('Log Created')
+    send_msg('Log (Trades) Created')
+
+    # Order Logs
+    order_message = messager.get_order_log()
+    btc_logger.log(message, "order_log.csv")
+    send_msg('Log (Orders) Created')
 
 @authorized_only
 def _schedule_log(bot: Bot, update: Update) -> None:
