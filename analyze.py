@@ -76,6 +76,10 @@ def populate_indicators(dataframe: DataFrame) -> DataFrame:
     Adds several different TA indicators to the given DataFrame
     """
 
+    # Log the dataframe
+    with open("dataframe.txt", 'w') as file:
+        file.write(dataframe)
+
     #Determine Trend
     dataframe = indicators.TREND(dataframe)
 
