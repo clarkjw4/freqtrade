@@ -20,8 +20,15 @@ class Logger():
 		self.scheduler = BackgroundScheduler()
 
 	def initialize_log_file(self, a_file_name = "log.csv"):
+		headers = ""
+
+		if a_file_name == "log.csv":
+			headers = "Date,Time,TradeCount,BestPerformingTrade,AverageDuration,ROI,BTCValue/USDValue(Wallet),PriceOfBTC,ErrorLogs"
+		elif a_file_name == "order_log.csv":
+			headers = "TimeStamp,CoinName,OrderType,Price,OrderUuid"
+
 		with open(a_file_name, 'w') as file:
-			file.write("Date,Time,TradeCount,BestPerformingTrade,AverageDuration,ROI,BTCValue/USDValue(Wallet),PriceOfBTC,ErrorLogs")
+			file.write(headers)
 			file.write("\n")
 
 	def log(self, text, a_file_name = "log.csv"):
@@ -43,10 +50,10 @@ class Logger():
 		self.log(message)
 
 		# Order Logs
-		order_message = messager.get_order_log()
+		data = exchange.get_order_log()
+		limit = self.limit_order_log()
+		order_message = messager.get_order_log(data[limit:])
 		self.log(message, "order_log.csv")
-
-
 
 	def start_scheduled_log(self, time=6):# -> BackgroundScheduler():
 		
@@ -63,3 +70,12 @@ class Logger():
 	def stop_scheduled_log(self):
 		if self.scheduler.running:
 			self.scheduler.shutdown()
+
+	def limit_order_log(self):
+		if os.path.exists("order_log.csv"):
+			count = -1 # To account for the headers
+			with open("order_log.csv") as file:
+				for line in file:
+					count += 1
+
+		return count

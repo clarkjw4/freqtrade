@@ -41,12 +41,13 @@ def get_ticker(pair: str, minimum_date: arrow.Arrow) -> dict:
 
     try:
         data = response.json()
+        print(response)
 
         if not data['success']:
             raise RuntimeError('BITTREX: {}'.format(data['message']))
         return data
     except:
-        logger.debug("JSON doesn't exist or gave an unexplainable bug. Message: {0}".format(data))
+        logger.debug("JSON doesn't exist or gave an unexplainable bug.")
         raise RuntimeError('JSON does not exist.')
 
 def get_btc_current_price():
@@ -75,6 +76,10 @@ def populate_indicators(dataframe: DataFrame) -> DataFrame:
     """
     Adds several different TA indicators to the given DataFrame
     """
+
+    # Log the dataframe
+    with open("dataframe.txt", 'w') as file:
+        file.write(dataframe)
 
     #Determine Trend
     dataframe = indicators.TREND(dataframe)
