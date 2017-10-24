@@ -1,6 +1,7 @@
 import logging
 import datetime
 from typing import Callable, Any
+import os
 
 from telegram.error import NetworkError
 from telegram.ext import CommandHandler, Updater
@@ -134,17 +135,26 @@ def _log(bot: Bot, update: Update) -> None:
     :return: None
     """
     trades = Trade.query.order_by(Trade.id).all()
-    
-    markdown_msg = messager.get_log(trades)
-    btc_logger.log(markdown_msg)
-    send_msg('Log (Trades) Created')
+    balances = exchange.get_balances()
+    markdown_msg = messager.get_log(trades, balances)
+    btc_logger.log(markdown_msg) 
+    filepath_trades = os.path.dirname(os.path.abspath('log.csv'))
+    send_msg('Log (Trades) Created: file:///{path}'.format(path=filepath_trades))
 
     # Order Logs
+<<<<<<< HEAD
+    order_messages = messager.get_order_log()
+    filepath_orders = os.path.dirname(os.path.abspath('order_log.csv'))
+    for message in order_messages:
+        btc_logger.log(message, "order_log.csv")
+    send_msg('Log (Orders) Created: file:///{path}'.format(path=filepath_orders))
+=======
     data = exchange.get_order_log()
     limit = self.limit_order_log()
     order_message = messager.get_order_log(data[limit:])
     btc_logger.log(message, "order_log.csv")
     send_msg('Log (Orders) Created')
+>>>>>>> 7c80020b484e951abd04a75d56b28caee9874511
 
 @authorized_only
 def _schedule_log(bot: Bot, update: Update) -> None:
