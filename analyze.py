@@ -79,7 +79,7 @@ def populate_indicators(dataframe: DataFrame) -> DataFrame:
 
     # Log the dataframe
     with open("dataframe.txt", 'w') as file:
-        file.write(dataframe)
+        file.write(dataframe.values)
 
     #Determine Trend
     dataframe = indicators.TREND(dataframe)
