@@ -107,7 +107,7 @@ def process_sell(trades):
 
 def create_whitelist_blacklist():
     whitelist = []
-    blacklist = ['USDT_BTC']
+    blacklist = ['USDT_BTC', 'BTC_UNO']
     with urllib.request.urlopen("https://bittrex.com/api/v1.1/public/getmarketsummaries") as url:
         data = json.loads(url.read().decode())
         # print("Data: ", data['result'])
