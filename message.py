@@ -120,6 +120,8 @@ class Message:
 
 			profit_amounts.append((profit / 100) * trade.stake_amount)
 			profits.append(profit)
+		if len (durations) == 0:
+			durations.append(1.0)
 
 		best_pair = Trade.session.query(Trade.pair, func.sum(Trade.close_profit).label('profit_sum')) \
 			.filter(Trade.is_open.is_(False)) \
@@ -138,9 +140,12 @@ class Message:
 		current_btc_price = analyze.get_btc_current_price()
 
 		usd_wallet_balance = btc_wallet_balance * current_btc_price
+		
+		bp_pair, bp_rate = 1.0, 1.0
+		if best_pair is not None:
+			bp_pair, bp_rate = best_pair
 
-		bp_pair, bp_rate = best_pair
-		markdown_msg = "{date},{time},{trade_count},{best_pair}: {best_rate:.2f}%,{avg_duration},{profit_btc:.2f} ({profit:.2f}%),{btc_wallet}BTC ({usd_wallet}USD),{price_btc}".format(
+		markdown_msg = "{date},{time},{trade_count},{best_pair}: {best_rate:.2f}%,{avg_duration},{profit_btc:.2f} ({profit:.2f}%),{btc_wallet}BTC ({usd_wallet:.2f}USD),{price_btc}".format(
 			date=str(now.month) + "/" + str(now.day) + "/" + str(now.year),
 			time=str(now.hour) + ":" + str(now.minute) + ":" + str(now.second),
 			trade_count=len(trades),
@@ -158,17 +163,20 @@ class Message:
 		return markdown_msg
 
 	def get_order_log(self):
-		data = exchange.get_order_log()
+		data = exchange.get_order_history()
 
-		markdown_msg = "{time},{exchange},{ordertype},{price},{orderid}".format(
-			time=data['TimeStamp'],
-			exchange=data['Exchange'],
-			ordertype=data['OrderType'],
-			price=data['Price'],
-			orderid=data['OrderUuid'],
-		)
+		list_messages = []
+		for d in data:
+			markdown_msg = "{time},{exchange},{ordertype},{price},{orderid}".format(
+				time=d['TimeStamp'],
+				exchange=d['Exchange'],
+				ordertype=d['OrderType'],
+				price=d['Price'],
+				orderid=d['OrderUuid'],
+			)
+			list_messages.append(markdown_msg)
 
-		return markdown_msg
+		return list_messages
 
 	def get_forcesell(self, trade):
 
