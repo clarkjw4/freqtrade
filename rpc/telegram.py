@@ -142,7 +142,8 @@ def _log(bot: Bot, update: Update) -> None:
     send_msg('Log (Trades) Created: file:///{path}'.format(path=filepath_trades))
 
     # Order Logs
-    order_messages = messager.get_order_log()
+    limit = self.limit_order_log()
+    order_messages = messager.get_order_log(limit)
     filepath_orders = os.path.dirname(os.path.abspath('order_log.csv'))
     for message in order_messages:
         btc_logger.log(message, "order_log.csv")

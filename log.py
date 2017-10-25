@@ -50,7 +50,6 @@ class Logger():
 		self.log(message)
 
 		# Order Logs
-		data = exchange.get_order_history()
 		limit = self.limit_order_log()
 		order_message = messager.get_order_log(limit)
 		self.log(message, "order_log.csv")
