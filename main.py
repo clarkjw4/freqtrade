@@ -49,7 +49,7 @@ def _process() -> None:
 
         if len(trades) < _CONF['max_open_trades']:
            try:
-                Create entity and execute trade
+                # Create entity and execute trade
                trade = create_trade(float(_CONF['stake_amount']), exchange.EXCHANGE)
                if trade:
                    Trade.session.add(trade)
@@ -59,17 +59,17 @@ def _process() -> None:
                logger.exception('Unable to create trade')
 
         for trade in trades:
-            Check if there is already an open order for this trade
+            # Check if there is already an open order for this trade
            orders = exchange.get_open_orders(trade.pair)
            orders = [o for o in orders if o['id'] == trade.open_order_id]
            if orders:
                logger.info('There is an open order for: %s', orders[0])
            else:
-                Update state
+                # Update state
                trade.open_order_id = None
-                Check if this trade can be closed
+                # Check if this trade can be closed
                if not close_trade_if_fulfilled(trade):
-                    Check if we can sell our current pair
+                    # Check if we can sell our current pair
                    handle_trade(trade)
         Trade.session.flush()
     except (ConnectionError, json.JSONDecodeError) as error:
