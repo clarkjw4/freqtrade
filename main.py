@@ -89,6 +89,9 @@ def process_buy(trades):
         except ValueError:
             logger.exception('Unable to create trade')
 
+        except KeyboardInterrupt:
+            exit (0)
+
 def process_sell(trades):
     for trade in trades:
         # Check if there is already an open order for this trade
@@ -317,6 +320,10 @@ def app(config: dict) -> None:
     except RuntimeError:
         telegram.send_msg('*Status:* Got RuntimeError: ```\n{}\n```'.format(traceback.format_exc()))
         logger.exception('RuntimeError. Trader stopped!')
+    
+    except KeyboardInterrupt:
+        exit (0)
+
     finally:
         telegram.send_msg('*Status:* `Trader has stopped`')
 

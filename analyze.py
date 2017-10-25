@@ -41,7 +41,7 @@ def get_ticker(pair: str, minimum_date: arrow.Arrow) -> dict:
 
     try:
         data = response.json()
-        print(response)
+        # print(response)
 
         if not data['success']:
             raise RuntimeError('BITTREX: {}'.format(data['message']))
@@ -78,8 +78,7 @@ def populate_indicators(dataframe: DataFrame) -> DataFrame:
     """
 
     # Log the dataframe
-    with open("dataframe.txt", 'w') as file:
-        file.write(dataframe.values)
+    dataframe.to_csv("dataframe.csv", sep='\t')
 
     #Determine Trend
     dataframe = indicators.TREND(dataframe)
@@ -155,7 +154,7 @@ def populate_buy_trend(dataframe: DataFrame) -> DataFrame:
         # (dataframe['upswing'] == 1) &
         # (dataframe['adx'] > 25) & # adx over 25 tells there's enough momentum
         # (dataframe['macd'] > dataframe['macds']) &
-        (dataframe['Trend'].tail(4) == -1) &
+        (dataframe['Trend'].tail(3) == -1) &
         (dataframe['PositionBBANDS'] == 1) &
         (dataframe['PositionSTOCH'] == 1) &
         (dataframe['PositionRSI'] == 1),
@@ -194,7 +193,11 @@ def get_buy_signal(pair: str) -> bool:
     latest = dataframe.iloc[-1]
 
     # Check if dataframe is out of date
-    signal_date = arrow.get(latest['date'])
+    signal_date = arrow.get(latest['date'].replace('T',''), 'YYYY-MM-DDHH:mm:ss')
+    # print (signal_date)
+    # print (arrow.now() - timedelta(minutes=10))
+    # print(latest['date'].replace('T',''))
+
     if signal_date < arrow.now() - timedelta(minutes=10):
         return False
 

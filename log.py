@@ -50,9 +50,9 @@ class Logger():
 		self.log(message)
 
 		# Order Logs
-		data = exchange.get_order_log()
+		data = exchange.get_order_history()
 		limit = self.limit_order_log()
-		order_message = messager.get_order_log(data[limit:])
+		order_message = messager.get_order_log(limit)
 		self.log(message, "order_log.csv")
 
 	def start_scheduled_log(self, time=6):# -> BackgroundScheduler():
@@ -72,6 +72,8 @@ class Logger():
 			self.scheduler.shutdown()
 
 	def limit_order_log(self):
+		count = 0
+
 		if os.path.exists("order_log.csv"):
 			count = -1 # To account for the headers
 			with open("order_log.csv") as file:

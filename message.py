@@ -162,12 +162,13 @@ class Message:
 
 		return markdown_msg
 
-<<<<<<< HEAD
-	def get_order_log(self):
+	def get_order_log(self, limit):
 		data = exchange.get_order_history()
-
+		limited_data = data[limit:]
+		
 		list_messages = []
-		for d in data:
+
+		for d in limited_data:
 			markdown_msg = "{time},{exchange},{ordertype},{price},{orderid}".format(
 				time=d['TimeStamp'],
 				exchange=d['Exchange'],
@@ -176,17 +177,6 @@ class Message:
 				orderid=d['OrderUuid'],
 			)
 			list_messages.append(markdown_msg)
-=======
-	def get_order_log(self, data):
-
-		markdown_msg = "{time},{exchange},{ordertype},{price},{orderid}".format(
-			time=data['TimeStamp'],
-			exchange=data['Exchange'],
-			ordertype=data['OrderType'],
-			price=data['Price'],
-			orderid=data['OrderUuid'],
-		)
->>>>>>> 7c80020b484e951abd04a75d56b28caee9874511
 
 		return list_messages
 

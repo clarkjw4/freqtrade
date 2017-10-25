@@ -142,19 +142,11 @@ def _log(bot: Bot, update: Update) -> None:
     send_msg('Log (Trades) Created: file:///{path}'.format(path=filepath_trades))
 
     # Order Logs
-<<<<<<< HEAD
     order_messages = messager.get_order_log()
     filepath_orders = os.path.dirname(os.path.abspath('order_log.csv'))
     for message in order_messages:
         btc_logger.log(message, "order_log.csv")
     send_msg('Log (Orders) Created: file:///{path}'.format(path=filepath_orders))
-=======
-    data = exchange.get_order_log()
-    limit = self.limit_order_log()
-    order_message = messager.get_order_log(data[limit:])
-    btc_logger.log(message, "order_log.csv")
-    send_msg('Log (Orders) Created')
->>>>>>> 7c80020b484e951abd04a75d56b28caee9874511
 
 @authorized_only
 def _schedule_log(bot: Bot, update: Update) -> None:
