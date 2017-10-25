@@ -52,7 +52,7 @@ class Logger():
 		# Order Logs
 		limit = self.limit_order_log()
 		order_message = messager.get_order_log(limit)
-		self.log(message, "order_log.csv")
+		self.log(order_message, "order_log.csv")
 
 	def start_scheduled_log(self, time=6):# -> BackgroundScheduler():
 		
