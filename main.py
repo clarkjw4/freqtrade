@@ -40,37 +40,37 @@ def _process() -> None:
         trades = Trade.query.filter(Trade.is_open.is_(True)).all()
         # TODO Add BTC Current < Open
         
-        p_buy = Process(target=process_buy, args=[trades])
-        p_buy.start()
-        p_sell = Process(target=process_sell, args=[trades])
-        p_sell.start()
-        p_buy.join()
-        p_sell.join()
+        # p_buy = Process(target=process_buy, args=[trades])
+        # p_buy.start()
+        # p_sell = Process(target=process_sell, args=[trades])
+        # p_sell.start()
+        # p_buy.join()
+        # p_sell.join()
 
-        #if len(trades) < _CONF['max_open_trades']:
-        #    try:
-                # Create entity and execute trade
-        #        trade = create_trade(float(_CONF['stake_amount']), exchange.EXCHANGE)
-        #        if trade:
-        #            Trade.session.add(trade)
-        #        else:
-        #            logging.info('Streets askin too high...')
-        #    except ValueError:
-        #        logger.exception('Unable to create trade')
+        if len(trades) < _CONF['max_open_trades']:
+           try:
+                Create entity and execute trade
+               trade = create_trade(float(_CONF['stake_amount']), exchange.EXCHANGE)
+               if trade:
+                   Trade.session.add(trade)
+               else:
+                   logging.info('Streets askin too high...')
+           except ValueError:
+               logger.exception('Unable to create trade')
 
-        #for trade in trades:
-            # Check if there is already an open order for this trade
-        #    orders = exchange.get_open_orders(trade.pair)
-        #    orders = [o for o in orders if o['id'] == trade.open_order_id]
-        #    if orders:
-        #        logger.info('There is an open order for: %s', orders[0])
-        #    else:
-                # Update state
-        #        trade.open_order_id = None
-                # Check if this trade can be closed
-        #        if not close_trade_if_fulfilled(trade):
-                    # Check if we can sell our current pair
-        #            handle_trade(trade)
+        for trade in trades:
+            Check if there is already an open order for this trade
+           orders = exchange.get_open_orders(trade.pair)
+           orders = [o for o in orders if o['id'] == trade.open_order_id]
+           if orders:
+               logger.info('There is an open order for: %s', orders[0])
+           else:
+                Update state
+               trade.open_order_id = None
+                Check if this trade can be closed
+               if not close_trade_if_fulfilled(trade):
+                    Check if we can sell our current pair
+                   handle_trade(trade)
         Trade.session.flush()
     except (ConnectionError, json.JSONDecodeError) as error:
         msg = 'Got {} in _process()'.format(error.__class__.__name__)
