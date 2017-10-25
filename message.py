@@ -178,7 +178,10 @@ class Message:
 			)
 			list_messages.append(markdown_msg)
 
-		return_message = '\n'.join(list_messages)
+		return_message = ""
+		for message in list_messages:
+			return_message += message + "\n"
+
 		return return_message
 
 	def get_forcesell(self, trade):
