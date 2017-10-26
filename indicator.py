@@ -57,7 +57,7 @@ class Indicator:
 	def STOK(self, df, n):
 		#STOK = ((df['close'] - pd.rolling_min(df['low'], n)) /
 		#(pd.rolling_max(df['high'], n) - pd.rolling_min(df['low'], n))) * 100
-		STOK = ((df['close'] - df['low'].rolling(n)) /
+		STOK = ((df['close'] - df['low'].rolling(n).min()) /
 		(df['high'].rolling(n).max() - df['low'].rolling(n).min())) * 100
 
 		return STOK
