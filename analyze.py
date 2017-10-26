@@ -154,7 +154,7 @@ def populate_buy_trend(dataframe: DataFrame) -> DataFrame:
         # (dataframe['upswing'] == 1) &
         # (dataframe['adx'] > 25) & # adx over 25 tells there's enough momentum
         # (dataframe['macd'] > dataframe['macds']) &
-        (dataframe['Trend'].tail(3) == -1) &
+        (dataframe['Trend'].tail(4) == -1) &
         (dataframe['PositionBBANDS'] == 1) &
         (dataframe['PositionSTOCH'] == 1) &
         (dataframe['PositionRSI'] == 1),
