@@ -10,6 +10,8 @@ import pandas as pd
 import numpy as np
 import math
 
+pd.options.mode.chained_assignment = None  # default='warn'
+
 class Indicator:
 
 	# Trend
@@ -53,16 +55,20 @@ class Indicator:
 
 	# Stochcastic
 	def STOK(self, df, n):
-		STOK = ((df['close'] - pd.rolling_min(df['low'], n)) /
-		(pd.rolling_max(df['high'], n) - pd.rolling_min(df['low'], n))) * 100
+		#STOK = ((df['close'] - pd.rolling_min(df['low'], n)) /
+		#(pd.rolling_max(df['high'], n) - pd.rolling_min(df['low'], n))) * 100
+		STOK = ((df['close'] - df['low'].rolling(n)) /
+		(df['high'].rolling(n).max() - df['low'].rolling(n).min())) * 100
 
 		return STOK
 
 	def STOD(self, df, n):
-		STOK = ((df['close'] - pd.rolling_min(df['low'], n)) /
-		(pd.rolling_max(df['high'], n) - pd.rolling_min(df['low'], n))) * 100
+		#STOK = ((df['close'] - pd.rolling_min(df['low'], n)) /
+		#(pd.rolling_max(df['high'], n) - pd.rolling_min(df['low'], n))) * 100
+		STOK = self.STOCK(df, n)
 
-		STOD = pd.rolling_mean(STOK, 3)
+		#STOD = pd.rolling_mean(STOK, 3)
+		STOD = STOK.rolling(3).mean()
 
 		return STOD
 
@@ -84,8 +90,10 @@ class Indicator:
 
 	# Working Bollinger Bands
 	def BBANDS(self, k, df, n):
-		MA = pd.stats.moments.rolling_mean(df['close'],k)
-		MSD = pd.stats.moments.rolling_std(df['close'],k)
+		#MA = pd.stats.moments.rolling_mean(df['close'],k)
+		MA = df['close'].rolling(k).mean()
+		#MSD = pd.stats.moments.rolling_std(df['close'],k)
+		MSD = df['close'].rolling(k).std()
 		df['upper'] = MA + (MSD*n)
 		df['lower'] = MA - (MSD*n)
 

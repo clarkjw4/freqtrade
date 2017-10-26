@@ -17,6 +17,8 @@ from misc import CONF_SCHEMA, get_state, State, update_state
 from rpc import telegram
 from multiprocessing import Process
 
+
+
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
