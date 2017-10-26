@@ -65,7 +65,7 @@ class Indicator:
 	def STOD(self, df, n):
 		#STOK = ((df['close'] - pd.rolling_min(df['low'], n)) /
 		#(pd.rolling_max(df['high'], n) - pd.rolling_min(df['low'], n))) * 100
-		STOK = self.STOCK(df, n)
+		STOK = self.STOK(df, n)
 
 		#STOD = pd.rolling_mean(STOK, 3)
 		STOD = STOK.rolling(3).mean()
