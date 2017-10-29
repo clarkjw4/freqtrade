@@ -294,12 +294,14 @@ def _cancelorder(bot: Bot, update: Update) -> None:
         # Cancel the order - According to test/test_main.py Line 84
         closed = main.close_trade_if_fulfilled(trade)
         if closed is not True:
-            raise RuntimeError('BITTREX: {}'.format(data['message']))
-        #exchange.cancel_order(trade.open_order_id)
+            send_msg('Order not open.')
+            logger.warning('BITTREX: {}'.format("Order not open."))
+            return
+        
         message = messager.get_cancelorder(trade)
         logger.info(message)
         send_msg(message)
-        #exchange.cancel_order(trade.open_order_id)
+        exchange.cancel_order(trade.open_order_id)
 
     except ValueError:
         send_msg('Invalid argument. Usage: `/closeorder <trade_id>`')
