@@ -40,8 +40,9 @@ def get_ticker(pair: str, minimum_date: arrow.Arrow) -> dict:
     response = requests.get(url, params=params, headers=headers)
 
     try:
+        print(response)
+        print (response.content)
         data = response.json()
-        # print(response)
 
         if not data['success']:
             raise RuntimeError('BITTREX: {}'.format(data['message']))

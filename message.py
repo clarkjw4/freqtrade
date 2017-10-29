@@ -5,6 +5,7 @@ import arrow
 import datetime
 import exchange
 import analyze
+import telegram
 
 
 class Message:
@@ -78,7 +79,7 @@ class Message:
 			.first()
 
 		if not best_pair:
-			send_msg('*Status:* `no closed trade`', bot=bot)
+			telegram.send_msg('*Status:* `no closed trade`', bot=bot)
 			return
 
 		bp_pair, bp_rate = best_pair
