@@ -42,12 +42,9 @@ def get_ticker(pair: str, minimum_date: arrow.Arrow) -> dict:
     try:
         print(response)
         
-        while(response == "<Response [524]>")
-        {
+        while(response == "<Response [524]>"):
             response = requests.get(url, params=params, headers=headers)
             logger.debug("<Response [524]>: Retry establishing connection to Bittrex.")
-
-        }
 
         data = response.json()
 
