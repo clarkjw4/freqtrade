@@ -40,8 +40,10 @@ def get_ticker(pair: str, minimum_date: arrow.Arrow) -> dict:
     response = requests.get(url, params=params, headers=headers)
 
     try:
+
+        print(response)
+
         while (response == "<Response [524]>" or response == "<Response [503]>"):
-            print(response)
             response = requests.get(url, params=params, headers=headers)
             logger.debug("{0}: Retry establishing connection to Bittrex.".format(response))
             time.sleep(25)
@@ -51,9 +53,10 @@ def get_ticker(pair: str, minimum_date: arrow.Arrow) -> dict:
         if not data['success']:
             raise RuntimeError('BITTREX: {}'.format(data['message']))
         return data
+    
     except:
-        logger.debug("<Response [524]>: The connection to the origin web server was made, but the origin web server timed out before responding.")
-        raise RuntimeError('<Response [524]>: TimeOut Occurred')
+        logger.debug(response)
+        raise RuntimeError('{0}: TimeOut Occurred'.format(response))
 
 def get_btc_current_price():
     # returns the current btc price in USD
