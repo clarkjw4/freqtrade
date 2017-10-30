@@ -40,15 +40,11 @@ def get_ticker(pair: str, minimum_date: arrow.Arrow) -> dict:
     response = requests.get(url, params=params, headers=headers)
 
     try:
-        print(response)
-        
-        while (response == "<Response [524]>"):
+        while (response == "<Response [524]>" or response == "<Response [503]>"):
+            print(response)
             response = requests.get(url, params=params, headers=headers)
-            logger.debug("<Response [524]>: Retry establishing connection to Bittrex.")
-
-        while (response == "<Response [503]>"):
-            response = requests.get(url, params=params, headers=headers)
-            logger.debug("<Response [503]>: Retry establishing connection to Bittrex.")
+            logger.debug("{0}: Retry establishing connection to Bittrex.".format(response))
+            time.sleep(25)
 
         data = response.json()
 
