@@ -296,7 +296,7 @@ def _cancelorder(bot: Bot, update: Update) -> None:
         logger.info(message)
         send_msg(message)
         exchange.cancel_order(trade.open_order_id)
-        main.close_trade_if_fulfilled(trade)
+        # main.close_trade_if_fulfilled(trade)
 
     except ValueError:
         send_msg('Invalid argument. Usage: `/closeorder <trade_id>`')

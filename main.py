@@ -159,7 +159,7 @@ def execute_sell(trade: Trade, current_rate: float) -> None:
     balance = exchange.get_balance(currency)
 
     profit = trade.exec_sell_order(current_rate, balance)
-    message = '*{}:* Dumping [{}]({}) for `{:f} (profit: {}%)`'.format(
+    message = '*{}:* Make It Rain!!!! with [{}]({}) for `{:f} (profit: {}%)`'.format(
         trade.exchange.name,
         trade.pair.replace('_', '/'),
         exchange.get_pair_detail_url(trade.pair),
