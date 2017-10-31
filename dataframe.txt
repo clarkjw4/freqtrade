@@ -1,0 +1,136 @@
+2017-10-30 20:10:01,211 - analyze - DEBUG - buy_trigger: 2017-10-31T02:05:00 (pair=BTC_NAV, signal=False)
+<Response [524]>
+2017-10-30 20:11:41,324 - analyze - DEBUG - <Response [524]>
+2017-10-30 20:11:42,105 - __main__ - ERROR - RuntimeError. Trader stopped!
+Traceback (most recent call last):
+  File "/Users/John/Documents/GitHub/freqtrade/analyze.py", line 51, in get_ticker
+    data = response.json()
+  File "/Users/John/Documents/GitHub/freqtrade/.env/lib/python3.6/site-packages/requests/models.py", line 892, in json
+    return complexjson.loads(self.text, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/json/__init__.py", line 354, in loads
+    return _default_decoder.decode(s)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/json/decoder.py", line 339, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/json/decoder.py", line 357, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "./main.py", line 318, in app
+    _process()
+  File "./main.py", line 55, in _process
+    trade = create_trade(float(_CONF['stake_amount']), exchange.EXCHANGE)
+  File "./main.py", line 247, in create_trade
+    if get_buy_signal(_pair):
+  File "/Users/John/Documents/GitHub/freqtrade/analyze.py", line 200, in get_buy_signal
+    dataframe = analyze_ticker(pair)
+  File "/Users/John/Documents/GitHub/freqtrade/analyze.py", line 188, in analyze_ticker
+    data = get_ticker(pair, minimum_date)
+  File "/Users/John/Documents/GitHub/freqtrade/analyze.py", line 59, in get_ticker
+    raise RuntimeError("{0}: TimeOut Occurred".format(response))
+RuntimeError: <Response [524]>: TimeOut Occurred
+
+2017-10-30 20:31:05,139 - analyze - DEBUG - buy_trigger: 2017-10-31T02:25:00 (pair=BTC_LSK, signal=False)
+<Response [503]>
+2017-10-30 20:31:05,289 - analyze - DEBUG - <Response [503]>
+2017-10-30 20:31:06,035 - __main__ - ERROR - RuntimeError. Trader stopped!
+Traceback (most recent call last):
+  File "/Users/John/Documents/GitHub/freqtrade/analyze.py", line 51, in get_ticker
+    data = response.json()
+  File "/Users/John/Documents/GitHub/freqtrade/.env/lib/python3.6/site-packages/requests/models.py", line 892, in json
+    return complexjson.loads(self.text, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/json/__init__.py", line 354, in loads
+    return _default_decoder.decode(s)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/json/decoder.py", line 339, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/json/decoder.py", line 357, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "./main.py", line 318, in app
+    _process()
+  File "./main.py", line 55, in _process
+    trade = create_trade(float(_CONF['stake_amount']), exchange.EXCHANGE)
+  File "./main.py", line 247, in create_trade
+    if get_buy_signal(_pair):
+  File "/Users/John/Documents/GitHub/freqtrade/analyze.py", line 200, in get_buy_signal
+    dataframe = analyze_ticker(pair)
+  File "/Users/John/Documents/GitHub/freqtrade/analyze.py", line 188, in analyze_ticker
+    data = get_ticker(pair, minimum_date)
+  File "/Users/John/Documents/GitHub/freqtrade/analyze.py", line 59, in get_ticker
+    raise RuntimeError("{0}: TimeOut Occurred".format(response))
+RuntimeError: <Response [503]>: TimeOut Occurred
+
+2017-10-30 20:57:05,476 - analyze - DEBUG - buy_trigger: 2017-10-31T02:50:00 (pair=BTC_ADX, signal=False)
+<Response [503]>
+2017-10-30 20:57:05,607 - analyze - DEBUG - <Response [503]>
+2017-10-30 20:57:06,372 - __main__ - ERROR - RuntimeError. Trader stopped!
+Traceback (most recent call last):
+  File "/Users/John/Documents/GitHub/freqtrade/analyze.py", line 51, in get_ticker
+    data = response.json()
+  File "/Users/John/Documents/GitHub/freqtrade/.env/lib/python3.6/site-packages/requests/models.py", line 892, in json
+    return complexjson.loads(self.text, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/json/__init__.py", line 354, in loads
+    return _default_decoder.decode(s)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/json/decoder.py", line 339, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/json/decoder.py", line 357, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "./main.py", line 318, in app
+    _process()
+  File "./main.py", line 55, in _process
+    trade = create_trade(float(_CONF['stake_amount']), exchange.EXCHANGE)
+  File "./main.py", line 247, in create_trade
+    if get_buy_signal(_pair):
+  File "/Users/John/Documents/GitHub/freqtrade/analyze.py", line 200, in get_buy_signal
+    dataframe = analyze_ticker(pair)
+  File "/Users/John/Documents/GitHub/freqtrade/analyze.py", line 188, in analyze_ticker
+    data = get_ticker(pair, minimum_date)
+  File "/Users/John/Documents/GitHub/freqtrade/analyze.py", line 59, in get_ticker
+    raise RuntimeError("{0}: TimeOut Occurred".format(response))
+RuntimeError: <Response [503]>: TimeOut Occurred
+
+2017-10-30 21:51:41,048 - analyze - DEBUG - buy_trigger: 2017-10-31T03:45:00 (pair=BTC_VTC, signal=False)
+<Response [503]>
+2017-10-30 21:51:41,171 - analyze - DEBUG - <Response [503]>
+2017-10-30 21:51:41,964 - __main__ - ERROR - RuntimeError. Trader stopped!
+Traceback (most recent call last):
+  File "/Users/John/Documents/GitHub/freqtrade/analyze.py", line 51, in get_ticker
+    data = response.json()
+  File "/Users/John/Documents/GitHub/freqtrade/.env/lib/python3.6/site-packages/requests/models.py", line 892, in json
+    return complexjson.loads(self.text, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/json/__init__.py", line 354, in loads
+    return _default_decoder.decode(s)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/json/decoder.py", line 339, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/json/decoder.py", line 357, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "./main.py", line 318, in app
+    _process()
+  File "./main.py", line 55, in _process
+    trade = create_trade(float(_CONF['stake_amount']), exchange.EXCHANGE)
+  File "./main.py", line 247, in create_trade
+    if get_buy_signal(_pair):
+  File "/Users/John/Documents/GitHub/freqtrade/analyze.py", line 200, in get_buy_signal
+    dataframe = analyze_ticker(pair)
+  File "/Users/John/Documents/GitHub/freqtrade/analyze.py", line 188, in analyze_ticker
+    data = get_ticker(pair, minimum_date)
+  File "/Users/John/Documents/GitHub/freqtrade/analyze.py", line 59, in get_ticker
+    raise RuntimeError("{0}: TimeOut Occurred".format(response))
+RuntimeError: <Response [503]>: TimeOut Occurred
+
