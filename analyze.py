@@ -187,6 +187,19 @@ def analyze_ticker(pair: str) -> DataFrame:
     minimum_date = arrow.utcnow().shift(hours=-6)
     data = get_ticker(pair, minimum_date)
     dataframe = parse_ticker_dataframe(data['result'], minimum_date)
+
+    # If the length of the dataframe is greater than 1, then we are good 
+    # to pull out of the while loop, else we'll keep looping until the error
+    # is fixed. (Unknown if this is final fix)
+    empty = True
+
+    while is empty:
+        if len(dataframe.columns) > 1:
+            empty = False
+        else:
+            data = get_ticker(pair, minimum_date)
+            dataframe = parse_ticker_dataframe(data['result'], minimum_date)
+
     dataframe = populate_indicators(dataframe)
     dataframe = populate_buy_trend(dataframe)
     return dataframe
