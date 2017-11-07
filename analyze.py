@@ -157,17 +157,31 @@ def populate_buy_trend(dataframe: DataFrame) -> DataFrame:
     # consider prices above ema to be in upswing
     dataframe.loc[dataframe['ema'] <= dataframe['close'], 'upswing'] = 1
 
-    dataframe.loc[
-        # (dataframe['swap'] == 1) &
-        # (dataframe['upswing'] == 1) &
-        # (dataframe['adx'] > 25) & # adx over 25 tells there's enough momentum
-        # (dataframe['macd'] > dataframe['macds']) &
-        (dataframe['Trend'].tail(4) == -1) &
-        (dataframe['PositionBBANDS'] == 1) &
-        (dataframe['PositionSTOCH'] == 1) &
-        (dataframe['PositionRSI'] == 1),
-        'buy'
-    ] = 1
+    # Capture last 10 rows and check if they are -1
+    temp_data = dataframe.tail(10)
+
+    # candle = -1 or candle = 1 (red or green)
+    numb_of_candles = 0
+    for candle in temp_data['Trend']:
+        if candle == -1:
+            numb_of_candles += 1
+
+    if numb_of_candles >= 7:
+        dataframe.loc['buy'] = 1
+    else:
+        dataframe.loc[
+            # (dataframe['swap'] == 1) &
+            # (dataframe['upswing'] == 1) &
+            # (dataframe['adx'] > 25) & # adx over 25 tells there's enough momentum
+            # (dataframe['macd'] > dataframe['macds']) &
+            (dataframe['Trend'].tail(4) == -1) &
+            (dataframe['PositionBBANDS'] == 1) &
+            (dataframe['PositionSTOCH'] == 1) &
+            (dataframe['PositionRSI'] == 1),
+            'buy'
+        ] = 1
+
+
 
     dataframe.loc[
         (dataframe['buy'] == 1),
