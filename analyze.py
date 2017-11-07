@@ -166,22 +166,18 @@ def populate_buy_trend(dataframe: DataFrame) -> DataFrame:
         if candle == -1:
             numb_of_candles += 1
 
-    if numb_of_candles >= 7:
-        dataframe.loc['buy'] = 1
-    else:
-        dataframe.loc[
-            # (dataframe['swap'] == 1) &
-            # (dataframe['upswing'] == 1) &
-            # (dataframe['adx'] > 25) & # adx over 25 tells there's enough momentum
-            # (dataframe['macd'] > dataframe['macds']) &
-            (dataframe['Trend'].tail(4) == -1) &
-            (dataframe['PositionBBANDS'] == 1) &
-            (dataframe['PositionSTOCH'] == 1) &
-            (dataframe['PositionRSI'] == 1),
-            'buy'
-        ] = 1
-
-
+    dataframe.loc[
+        # (dataframe['swap'] == 1) &
+        # (dataframe['upswing'] == 1) &
+        # (dataframe['adx'] > 25) & # adx over 25 tells there's enough momentum
+        # (dataframe['macd'] > dataframe['macds']) &
+        # (dataframe['Trend'].tail(4) == -1) & #Being replaced by the last 10 that we calculated above
+        (numb_of_candles >= 7) &
+        (dataframe['PositionBBANDS'] == 1) &
+        (dataframe['PositionSTOCH'] == 1) &
+        (dataframe['PositionRSI'] == 1),
+        'buy'
+    ] = 1
 
     dataframe.loc[
         (dataframe['buy'] == 1),
