@@ -41,7 +41,7 @@ def get_ticker(pair: str, minimum_date: arrow.Arrow) -> dict:
 
     try:
 
-        print(response)
+        #print(response)
 
         while (response.status_code != requests.codes.ok):
             response = requests.get(url, params=params, headers=headers)
@@ -193,12 +193,15 @@ def analyze_ticker(pair: str) -> DataFrame:
     # is fixed. (Unknown if this is final fix)
     empty = True
 
-    while is empty:
+    while empty:
+        logger.debug('Checking if dataframe is empty')
         if len(dataframe.columns) > 1:
             empty = False
+            logger.debug('Dataframe is not empty')
         else:
             data = get_ticker(pair, minimum_date)
             dataframe = parse_ticker_dataframe(data['result'], minimum_date)
+            logger.debug('Dataframe is empty; Trying again')
 
     dataframe = populate_indicators(dataframe)
     dataframe = populate_buy_trend(dataframe)

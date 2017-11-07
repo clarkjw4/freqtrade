@@ -22,11 +22,13 @@ from multiprocessing import Process
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+start_time = 0
 
 __author__ = "gcarq"
 __copyright__ = "gcarq 2017"
 __license__ = "GPLv3"
 __version__ = "0.9.0"
+
 
 _CONF = {}
 
@@ -217,9 +219,10 @@ def create_trade(stake_amount: float, _exchange: exchange.Exchange) -> Optional[
     :param _exchange: exchange to use
     """
     logger.info('Creating new trade with stake_amount: %f ...', stake_amount)
-    whitelist = _CONF[_exchange.name.lower()]['pair_whitelist']
+    whitelist = list(_CONF[_exchange.name.lower()]['pair_whitelist'])
     blacklist = _CONF[_exchange.name.lower()]['pair_blacklist']
 
+    print(whitelist)
     # Check if stake_amount is fulfilled
     if exchange.get_balance(_CONF['stake_currency']) < stake_amount:
         raise ValueError(
@@ -229,8 +232,9 @@ def create_trade(stake_amount: float, _exchange: exchange.Exchange) -> Optional[
     # Remove currently opened and latest pairs from whitelist
     trades = Trade.query.filter(Trade.is_open.is_(True)).all()
     latest_trade = Trade.query.filter(Trade.is_open.is_(False)).order_by(Trade.id.desc()).first()
-    if latest_trade:
+    if latest_trade and abs(datetime.now() - start_time) < datetime.timedelta(minutes=10):
         trades.append(latest_trade)
+        start_time = datetime.now()
     for trade in trades:
         if trade.pair in whitelist:
             whitelist.remove(trade.pair)
@@ -248,6 +252,9 @@ def create_trade(stake_amount: float, _exchange: exchange.Exchange) -> Optional[
             pair = _pair
             break
     else:
+        # if latest_trade is not None:
+        #     whitelist.append(latest_trade.pair)
+        #     whitelist.sort()
         return None
 
     open_rate = get_target_bid(exchange.get_ticker(pair))
@@ -263,6 +270,11 @@ def create_trade(stake_amount: float, _exchange: exchange.Exchange) -> Optional[
     )
     logger.info(message)
     telegram.send_msg(message)
+
+    # if latest_trade is not None:
+    #     whitelist.append(latest_trade.pair)
+    #     whitelist.sort()
+
     return Trade(pair=pair,
                  stake_amount=stake_amount,
                  open_rate=open_rate,
