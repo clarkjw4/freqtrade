@@ -4,7 +4,7 @@ import logging
 import time
 import traceback
 import urllib.request, json
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 from jsonschema import validate
@@ -30,10 +30,6 @@ __version__ = "0.9.0"
 
 
 _CONF = {}
-
-class Timer:
-    start_time = datetime.now()
-
 
 def _process() -> None:
     """
@@ -234,12 +230,12 @@ def create_trade(stake_amount: float, _exchange: exchange.Exchange) -> Optional[
     # Remove currently opened and latest pairs from whitelist
     trades = Trade.query.filter(Trade.is_open.is_(True)).all()
     latest_trade = Trade.query.filter(Trade.is_open.is_(False)).order_by(Trade.id.desc()).first()
-
-    time_limit_met = abs(datetime.now() - Timer.start_time) < datetime.timedelta(minutes=10)
+    start_time = latest_trade.close_date
+    time_limit_met = abs(datetime.now() - start_time) < datetime.timedelta(minutes=10)
 
     if latest_trade and time_limit_met:
         trades.append(latest_trade)
-        Timer.start_time = datetime.now()
+        start_time = datetime.now()
     for trade in trades:
         if trade.pair in whitelist:
             whitelist.remove(trade.pair)
