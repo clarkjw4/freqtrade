@@ -194,10 +194,10 @@ def analyze_ticker(pair: str) -> DataFrame:
     empty = True
 
     while empty:
-        logger.debug('Checking if dataframe is empty')
+        #logger.debug('Checking if dataframe is empty')
         if len(dataframe.columns) > 1:
             empty = False
-            logger.debug('Dataframe is not empty')
+            #logger.debug('Dataframe is not empty')
         else:
             data = get_ticker(pair, minimum_date)
             dataframe = parse_ticker_dataframe(data['result'], minimum_date)
