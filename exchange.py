@@ -161,8 +161,11 @@ def get_open_orders(pair: str) -> List[dict]:
         return []
     elif EXCHANGE == Exchange.BITTREX:
         data = _API.get_open_orders(pair.replace('_', '-'))
-        if not data['success']:
-            raise RuntimeError('BITTREX: {}'.format(data['message']))
+        while not data['success']:
+            data = _API.get_open_orders(pair.replace('_', '-'))
+            print("Data success: " + data['success'])
+        #if not data['success']:
+        #    raise RuntimeError('BITTREX: {}'.format(data['message']))
         return [{
             'id': entry['OrderUuid'],
             'type': entry['OrderType'],
