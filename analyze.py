@@ -158,7 +158,8 @@ def populate_buy_trend(dataframe: DataFrame) -> DataFrame:
     dataframe.loc[dataframe['ema'] <= dataframe['close'], 'upswing'] = 1
 
     # Capture last 10 rows and check if they are -1
-    temp_data = dataframe.tail(10)
+    # 18 = 1hr30min if candles are every 5min
+    temp_data = dataframe.tail(18)
 
     # candle = -1 or candle = 1 (red or green)
     numb_of_candles = 0
@@ -172,7 +173,7 @@ def populate_buy_trend(dataframe: DataFrame) -> DataFrame:
         # (dataframe['adx'] > 25) & # adx over 25 tells there's enough momentum
         # (dataframe['macd'] > dataframe['macds']) &
         # (dataframe['Trend'].tail(4) == -1) & #Being replaced by the last 10 that we calculated above
-        (numb_of_candles >= 7) &
+        (numb_of_candles >= 12) &
         (dataframe['PositionBBANDS'] == 1) &
         (dataframe['PositionSTOCH'] == 1) &
         (dataframe['PositionRSI'] == 1),
