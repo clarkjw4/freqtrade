@@ -230,7 +230,9 @@ def create_trade(stake_amount: float, _exchange: exchange.Exchange) -> Optional[
     # Remove currently opened and latest pairs from whitelist
     trades = Trade.query.filter(Trade.is_open.is_(True)).all()
     latest_trade = Trade.query.filter(Trade.is_open.is_(False)).order_by(Trade.id.desc()).first()
-    start_time = latest_trade.close_date
+    start_time = 0
+    if latest_trade is not None:
+        start_time = latest_trade.close_date
     time_limit_met = abs(datetime.now() - start_time) < timedelta(minutes=10)
 
     if latest_trade and time_limit_met:
