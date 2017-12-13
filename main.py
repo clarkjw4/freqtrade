@@ -121,7 +121,7 @@ def create_whitelist_blacklist():
             base_vol = currency['BaseVolume']
             bid_price = currency['Last']
             market_name = currency['MarketName'].replace('-', '_')
-            if "BTC" in market_name and base_vol > 200 and bid_price > 0.0001 and market_name not in blacklist:
+            if "BTC" in market_name and base_vol > 200 and bid_price > 0.0000001 and market_name not in blacklist:
                 whitelist.append (market_name)
 
     _CONF['bittrex']['pair_whitelist'] = whitelist
