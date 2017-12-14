@@ -163,8 +163,7 @@ def get_open_orders(pair: str) -> List[dict]:
         data = _API.get_open_orders(pair.replace('_', '-'))
         while not data['success']:
             data = _API.get_open_orders(pair.replace('_', '-'))
-            print("Data success: " + data['success'])
-        #if not data['success']:
+            print("Data success: " + str(data['success']))        #if not data['success']:
         #    raise RuntimeError('BITTREX: {}'.format(data['message']))
         return [{
             'id': entry['OrderUuid'],
